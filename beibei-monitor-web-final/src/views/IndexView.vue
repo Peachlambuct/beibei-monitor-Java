@@ -65,10 +65,10 @@ const store = useStore()
                     <el-icon class="menu-icon">
                       <Finished/>
                     </el-icon>
-                    <template #title>服务器安全</template>
+                    <template #title>账户安全</template>
                   </el-menu-item>
 
-                  <el-menu-item index="/index/file-management">
+                  <el-menu-item index="/index/manage">
                     <el-icon class="menu-icon">
 
                     </el-icon>
@@ -90,7 +90,7 @@ const store = useStore()
                     <template #title>预警提醒</template>
                   </el-menu-item>
 
-                  <el-menu-item index="/index/minecraft">
+                  <el-menu-item index="/index/child">
                     <el-icon class="menu-icon">
 
                     </el-icon>

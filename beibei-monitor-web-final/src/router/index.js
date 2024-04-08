@@ -26,12 +26,20 @@ const router = createRouter({
             children: [
                 {
                     path: '',
-                    name: 'manage',
-                    component: () => import('@/views/main/Manage.vue')
+                    name: 'overview',
+                    component: () => import('@/views/main/Overview.vue')
                 }, {
                     path: 'security',
                     name: 'security',
                     component: () => import('@/views/main/Security.vue')
+                }, {
+                    path: 'child',
+                    name: 'child',
+                    component: () => import('@/views/main/ChildManage.vue')
+                }, {
+                    path: 'manage',
+                    name: 'manage',
+                    component: () => import('@/views/main/Manage.vue')
                 }
             ]
         }
