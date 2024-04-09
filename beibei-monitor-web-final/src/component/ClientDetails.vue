@@ -229,6 +229,20 @@ watch(() => props.id, init, { immediate: true })
           <runtime-history style="margin-top: 20px" :data="details.runtime.list"/>
         </div>
         <el-empty description="服务器处于离线状态，请检查服务器是否正常运行" v-else/>
+
+        <div class="title" style="margin-top: 20px">
+          <i class="fa-solid fa-gauge-high"></i>
+          项目信息
+        </div>
+        <el-divider style="margin: 10px 0"/>
+        <div>
+          <ul>
+            <li>XXX项目--负责人:XXX--项目状态：开发中</li>
+            <li>XXX项目--负责人:XXX--项目状态：开发中</li>
+            <li>XXX项目--负责人:XXX--项目状态：运行中</li>
+            <li>XXX项目--负责人:XXX--项目状态：开发中</li>
+          </ul>
+        </div>
       </div>
     </div>
   </el-scrollbar>

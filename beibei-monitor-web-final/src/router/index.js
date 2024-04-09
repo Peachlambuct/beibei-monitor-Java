@@ -40,6 +40,10 @@ const router = createRouter({
                     path: 'manage',
                     name: 'manage',
                     component: () => import('@/views/main/Manage.vue')
+                }, {
+                    path: 'sshManage',
+                    name: 'ssh-manage',
+                    component: () => import('@/views/main/SSHManage.vue')
                 }
             ]
         }

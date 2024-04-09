@@ -113,7 +113,7 @@ const dark = ref(useDark())
                     运行维护
                   </template>
 
-                  <el-menu-item index="/index/server-management">
+                  <el-menu-item index="/index/sshManage">
                     <el-icon class="menu-icon">
 
                     </el-icon>
