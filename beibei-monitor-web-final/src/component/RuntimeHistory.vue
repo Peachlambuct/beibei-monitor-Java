@@ -13,7 +13,7 @@ const localTimeLine = list => list.map(item => new Date(item.timestamp).toLocale
 
 function updateCpuUsage(list) {
   const chart = charts[0]
-  let data = list.map(item => (item.cpuUsage  * 100).toFixed(1))
+  let data = list.map(item => (item.cpuUsage).toFixed(1))
   const option = defaultOption('CPU(%)', localTimeLine(list))
   singleSeries(option, 'CPU使用率(%)', data, ['#72c4fe', '#72d5fe', '#2b6fd733'])
   chart.setOption(option)

@@ -13,7 +13,7 @@ const props = defineProps({
       <div>
         <div class="name">
           <span :class="`flag-icon flag-icon-${data.location}`"></span>
-          <span style="margin: 0 5px;color: #00668c">{{ data.name }}</span>
+          <span style="margin: 0 5px">{{ data.name }}</span>
           <i class="fa-solid fa-pen-to-square interact-item" @click.stop="rename(data.id, data.name, update)"></i>
         </div>
         <div class="os">
@@ -35,7 +35,7 @@ const props = defineProps({
     <el-divider style="margin: 10px 0"/>
     <div class="network">
       <span style="margin-right: 10px">公网IP: {{data.ip}}</span>
-      <i class="fa-solid fa-copy interact-item" @click.stop="copyIp(data.ip)" style="color: #b6ccd8"></i>
+      <i class="fa-solid fa-copy interact-item" @click.stop="copyIp(data.ip)" style="color: dodgerblue"></i>
     </div>
     <div class="cpu">
       <span style="margin-right: 10px">处理器: {{data.cpuName}}</span>
@@ -47,9 +47,9 @@ const props = defineProps({
       <span>{{` ${data.memory.toFixed(1)} GB`}}</span>
     </div>
     <div class="progress">
-      <span>{{`CPU: ${(data.cpuUsage * 100).toFixed(1)}%`}}</span>
-      <el-progress :status="percentageToStatus(data.cpuUsage * 100)"
-                   :percentage="data.cpuUsage * 100" :stroke-width="5" :show-text="false"/>
+      <span>{{`CPU: ${(data.cpuUsage).toFixed(1)}%`}}</span>
+      <el-progress :status="percentageToStatus(data.cpuUsage)"
+                   :percentage="data.cpuUsage" :stroke-width="5" :show-text="false"/>
     </div>
     <div class="progress">
       <span>内存: <b>{{data.memoryUsage.toFixed(1)}}</b> GB</span>
@@ -70,7 +70,7 @@ const props = defineProps({
 </template>
 
 <style scoped>
-.dark .instance-card { color: #f5f4f1 }
+.dark .instance-card { color: #d9d9d9 }
 
 .interact-item {
   transition: .3s;
@@ -85,7 +85,7 @@ const props = defineProps({
 .instance-card {
   width: 320px;
   padding: 15px;
-  background-color: #f5f4f1;
+  background-color: var(--el-bg-color);
   border-radius: 5px;
   box-sizing: border-box;
   color: #606060;

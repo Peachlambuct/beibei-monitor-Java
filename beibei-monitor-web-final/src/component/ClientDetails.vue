@@ -190,10 +190,10 @@ watch(() => props.id, init, { immediate: true })
         <div v-if="details.base.online" v-loading="!details.runtime.list.length"
              style="min-height: 200px">
           <div style="display: flex" v-if="details.runtime.list.length">
-            <el-progress type="dashboard" :width="100" :percentage="now.cpuUsage * 100"
-                         :status="percentageToStatus(now.cpuUsage * 100)">
+            <el-progress type="dashboard" :width="100" :percentage="now.cpuUsage"
+                         :status="percentageToStatus(now.cpuUsage)">
               <div style="font-size: 17px;font-weight: bold;color: initial">CPU</div>
-              <div style="font-size: 13px;color: grey;margin-top: 5px">{{ (now.cpuUsage * 100).toFixed(1) }}%</div>
+              <div style="font-size: 13px;color: grey;margin-top: 5px">{{ (now.cpuUsage).toFixed(1) }}%</div>
             </el-progress>
             <el-progress style="margin-left: 20px" type="dashboard" :width="100"
                          :percentage="now.memoryUsage / details.runtime.memory * 100"
