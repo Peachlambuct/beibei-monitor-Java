@@ -44,6 +44,26 @@ const router = createRouter({
                     path: 'sshManage',
                     name: 'ssh-manage',
                     component: () => import('@/views/main/SSHManage.vue')
+                }, {
+                    path: 'earlyWarning',
+                    name: 'earlyWarning',
+                    component: () => import('@/views/main/EarlyWarningManage.vue')
+                },{
+                    path: 'taskAssignment',
+                    name: 'taskAssignment',
+                    component: () => import('@/views/main/TaskAssignment.vue')
+                },{
+                    path: 'devArrangement',
+                    name: 'devArrangement',
+                    component: () => import('@/views/main/DevArrangement.vue')
+                },{
+                    path: 'devArrangement',
+                    name: 'devArrangement',
+                    component: () => import('@/views/main/DevArrangement.vue')
+                },{
+                    path: 'devTask',
+                    name: 'devTask',
+                    component: () => import('@/views/main/DevTask.vue')
                 }
             ]
         }

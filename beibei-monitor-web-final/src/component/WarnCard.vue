@@ -11,25 +11,26 @@ import {Delete} from "@element-plus/icons-vue";
       <div>CPU：80 | Memory：20</div>
     </div>
     <div class="button-container">
-      <el-button style="float: right;margin-right: 10px" color="#00668c" :icon="Delete" type="primary"
-                 @click="register.show = true">SSH连接</el-button>
-      <el-button style="float: right;margin-right: 10px;margin-top: 10px" color="#00668c" :icon="Delete" type="primary"
-                 @click="register.show = true">删除SSH连接信息</el-button>
+      <el-button style="float: right;margin-right: 10px" :icon="Delete" color="#f5f5e9"
+                 @click="register.show = true">删除</el-button>
+      <el-button style="float: right;margin-right: 10px;margin-top: 10px" :icon="Delete" color="#f5f5e9"
+                 @click="register.show = true">修改预警阈值</el-button>
     </div>
   </div>
 </template>
 
 <style scoped>
 .card {
-  background-color: #d4eaf7;
-  height: 100px;
+  background-image: linear-gradient(to right, #d4eaf7,#b6ccd8);
+  height: 110px;
   width: 45%;
   border-radius: 10px;
-  margin: 20px;
+  margin: 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
+
 .button-container {
   display: flex;
   flex-direction: column;

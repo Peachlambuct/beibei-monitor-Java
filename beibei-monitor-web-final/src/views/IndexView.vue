@@ -89,7 +89,7 @@ const dark = ref(useDark())
                     </el-icon>
                     服务器安全
                   </template>
-                  <el-menu-item index="/index/sakura">
+                  <el-menu-item index="/index/earlyWarning">
                     <el-icon class="menu-icon">
 
                     </el-icon>
@@ -120,7 +120,7 @@ const dark = ref(useDark())
                     <template #title>SSH</template>
                   </el-menu-item>
 
-                  <el-menu-item index="/index/task-management">
+                  <el-menu-item index="/index/taskAssignment">
                     <el-icon class="menu-icon">
 
                     </el-icon>
@@ -137,18 +137,18 @@ const dark = ref(useDark())
                     开发相关
                   </template>
 
-                  <el-menu-item index="/index/server-management">
-                    <el-icon class="menu-icon">
-
-                    </el-icon>
-                    <template #title>开发任务</template>
-                  </el-menu-item>
-
-                  <el-menu-item index="/index/task-management">
+                  <el-menu-item index="/index/devArrangement">
                     <el-icon class="menu-icon">
 
                     </el-icon>
                     <template #title>开发安排</template>
+                  </el-menu-item>
+
+                  <el-menu-item index="/index/devTask">
+                    <el-icon class="menu-icon">
+
+                    </el-icon>
+                    <template #title>开发任务</template>
                   </el-menu-item>
                 </el-sub-menu>
               </el-menu>
