@@ -2,6 +2,8 @@ package com.example.controller;
 
 import com.example.entity.RestBean;
 import com.example.entity.dto.Account;
+import com.example.entity.dto.Client;
+import com.example.entity.dto.WarnProcessInfo;
 import com.example.entity.vo.request.RenameClientVO;
 import com.example.entity.vo.request.RenameNodeVO;
 import com.example.entity.vo.request.RuntimeDetailVO;
@@ -147,6 +149,12 @@ public class MonitorController {
         } else {
             return RestBean.noPermission();
         }
+    }
+
+    @PostMapping("/processWarn")
+    public RestBean<Void> processWarn(@RequestBody List<WarnProcessInfo> warnProcessInfos, @RequestAttribute(Const.ATTR_CLIENT) Client client) {
+        service.processWarn(warnProcessInfos,client.getId());
+        return RestBean.success();
     }
 
     private List<Integer> accountAccessClients(int uid) {

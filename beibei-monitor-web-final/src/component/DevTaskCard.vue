@@ -18,7 +18,7 @@ import {Delete} from "@element-plus/icons-vue";
     <el-divider style="margin: 10px 0"/>
     <div>
       <div class="desc" style="margin-left: 20px">
-        <div>任务描述：XXXX</div>
+        <div>任务描述：XXXXXXXXXXXXXXX</div>
         <div>任务负责人：XXXX</div>
         <div>任务开始时间：XXXX</div>
         <div>任务结束时间：XXXX</div>
@@ -39,8 +39,6 @@ import {Delete} from "@element-plus/icons-vue";
   width: 45%;
   border-radius: 10px;
   margin: 16px;
-
-
 }
 
 .button-container {
@@ -55,5 +53,8 @@ import {Delete} from "@element-plus/icons-vue";
     color: #5c5c5c;
     font-size: 15px;
   }
+  overflow: auto;
+  max-height: 200px;
+  height: 200px;
 }
 </style>

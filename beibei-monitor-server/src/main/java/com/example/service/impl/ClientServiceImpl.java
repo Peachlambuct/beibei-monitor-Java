@@ -5,12 +5,14 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.entity.dto.Client;
 import com.example.entity.dto.ClientDetail;
 import com.example.entity.dto.ClientSsh;
+import com.example.entity.dto.WarnProcessInfo;
 import com.example.entity.vo.request.*;
 import com.example.entity.vo.response.*;
 import com.example.mapper.ClientDetailMapper;
 import com.example.mapper.ClientMapper;
 import com.example.mapper.ClientSshMapper;
 import com.example.service.ClientService;
+import com.example.utils.Const;
 import com.example.utils.InfluxDbUtils;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.security.SecureRandom;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> implements ClientService {
@@ -79,7 +82,7 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
         ClientDetail detail = new ClientDetail();
         BeanUtils.copyProperties(vo, detail);
         detail.setId(client.getId());
-        if(Objects.nonNull(detailMapper.selectById(client.getId()))) {
+        if (Objects.nonNull(detailMapper.selectById(client.getId()))) {
             detailMapper.updateById(detail);
         } else {
             detailMapper.insert(detail);
@@ -100,7 +103,7 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
             ClientPreviewVO vo = client.asViewObject(ClientPreviewVO.class);
             BeanUtils.copyProperties(detailMapper.selectById(vo.getId()), vo);
             RuntimeDetailVO runtime = currentRuntime.get(client.getId());
-            if(this.isOnline(runtime)) {
+            if (this.isOnline(runtime)) {
                 BeanUtils.copyProperties(runtime, vo);
                 vo.setOnline(true);
             }
@@ -162,10 +165,10 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
     @Override
     public void saveClientSshConnection(SshConnectionVO vo) {
         Client client = clientIdCache.get(vo.getId());
-        if(client == null) return;
+        if (client == null) return;
         ClientSsh ssh = new ClientSsh();
         BeanUtils.copyProperties(vo, ssh);
-        if(Objects.nonNull(sshMapper.selectById(client.getId()))) {
+        if (Objects.nonNull(sshMapper.selectById(client.getId()))) {
             sshMapper.updateById(ssh);
         } else {
             sshMapper.insert(ssh);
@@ -177,13 +180,27 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
         ClientDetail detail = detailMapper.selectById(clientId);
         ClientSsh ssh = sshMapper.selectById(clientId);
         SshSettingsVO vo;
-        if(ssh == null) {
+        if (ssh == null) {
             vo = new SshSettingsVO();
         } else {
             vo = ssh.asViewObject(SshSettingsVO.class);
         }
         vo.setIp(detail.getIp());
         return vo;
+    }
+
+    /**
+     * 处理告警信息
+     * 还差一个形参是拥有这个服务器的用户email
+     * 杭州哥哥写，WarnProcessInfo是我Rust返回的进程类，我会返回top5的进程
+     * 在MonitorController里的接口叫/processWarn
+     * 作用是提交错误信息到rabbitmq里然后由rabbitmq来处理
+     * @param warnProcessInfos top5进程
+     * @param clientId 服务器id
+     */
+    @Override
+    public void processWarn(List<WarnProcessInfo> warnProcessInfos, int clientId) {
+
     }
 
     private boolean isOnline(RuntimeDetailVO runtime) {

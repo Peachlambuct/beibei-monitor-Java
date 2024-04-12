@@ -2,6 +2,7 @@ package com.example.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.example.entity.dto.Client;
+import com.example.entity.dto.WarnProcessInfo;
 import com.example.entity.vo.request.*;
 import com.example.entity.vo.response.*;
 
@@ -24,4 +25,5 @@ public interface ClientService extends IService<Client> {
     void deleteClient(int clientId);
     void saveClientSshConnection(SshConnectionVO vo);
     SshSettingsVO sshSettings(int clientId);
+    void processWarn(List<WarnProcessInfo> warnProcessInfos, int clientId);
 }
