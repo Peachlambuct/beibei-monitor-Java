@@ -16,7 +16,9 @@ import com.example.utils.Const;
 import com.example.utils.InfluxDbUtils;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
+import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
@@ -40,6 +42,12 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
 
     @Resource
     ClientSshMapper sshMapper;
+
+    @Resource
+    AmqpTemplate rabbitTemplate;
+
+    @Resource
+    StringRedisTemplate stringRedisTemplate;
 
     @PostConstruct
     public void initClientCache() {
@@ -200,7 +208,20 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
      */
     @Override
     public void processWarn(List<WarnProcessInfo> warnProcessInfos, int clientId) {
+        // 这里应该是发送到rabbitmq
+        //根据clientId获取负责节点人的email
+        if (stringRedisTemplate.opsForValue().get(Const.MQ_WARN + clientId) != null) return;
 
+        baseMapper.findEmailsByClientId(clientId).forEach(email -> {
+            Map<String, Object> data = Map.of("id",clientId,"data", warnProcessInfos, "email", email);
+            rabbitTemplate.convertAndSend(Const.MQ_WARN, data);
+        });
+
+        //测试用
+        Map<String, Object> data = Map.of("id",clientId,"data", warnProcessInfos, "email", "1479539484@qq.com");
+        rabbitTemplate.convertAndSend(Const.MQ_WARN, data);
+        //放入redis防止10分钟内重复发送
+        stringRedisTemplate.opsForValue().set(Const.MQ_WARN + clientId, "1", 10, TimeUnit.MINUTES);
     }
 
     private boolean isOnline(RuntimeDetailVO runtime) {

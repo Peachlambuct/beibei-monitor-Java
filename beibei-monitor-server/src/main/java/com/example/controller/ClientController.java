@@ -2,6 +2,7 @@ package com.example.controller;
 
 import com.example.entity.RestBean;
 import com.example.entity.dto.Client;
+import com.example.entity.dto.WarnProcessInfo;
 import com.example.entity.vo.request.ClientDetailVO;
 import com.example.entity.vo.request.RuntimeDetailVO;
 import com.example.service.ClientService;
@@ -9,6 +10,8 @@ import com.example.utils.Const;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/monitor")
@@ -34,6 +37,14 @@ public class ClientController {
     public RestBean<Void> updateRuntimeDetails(@RequestAttribute(Const.ATTR_CLIENT) Client client,
                                                @RequestBody @Valid RuntimeDetailVO vo) {
         service.updateRuntimeDetail(vo, client);
+        return RestBean.success();
+    }
+
+    @PostMapping("/processWarn")
+    public RestBean<Void> processWarn(@RequestBody List<WarnProcessInfo> warnProcessInfos,
+                                      @RequestAttribute(Const.ATTR_CLIENT) Client client) {
+        System.out.println(warnProcessInfos);
+        service.processWarn(warnProcessInfos,client.getId());
         return RestBean.success();
     }
 }

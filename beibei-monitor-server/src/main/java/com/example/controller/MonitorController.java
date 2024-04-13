@@ -151,11 +151,6 @@ public class MonitorController {
         }
     }
 
-    @PostMapping("/processWarn")
-    public RestBean<Void> processWarn(@RequestBody List<WarnProcessInfo> warnProcessInfos, @RequestAttribute(Const.ATTR_CLIENT) Client client) {
-        service.processWarn(warnProcessInfos,client.getId());
-        return RestBean.success();
-    }
 
     private List<Integer> accountAccessClients(int uid) {
         Account account = accountService.getById(uid);

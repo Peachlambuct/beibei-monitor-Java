@@ -11,9 +11,17 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitConfiguration {
     @Bean("mailQueue")
-    public Queue queue(){
+    public Queue mailQueue(){
         return QueueBuilder
                 .durable("mail")
+                .build();
+    }
+
+    //用于处理告警信息的消息队列
+    @Bean("warnQueue")
+    public Queue WarnQueue(){
+        return QueueBuilder
+                .durable("warn")
                 .build();
     }
 }
