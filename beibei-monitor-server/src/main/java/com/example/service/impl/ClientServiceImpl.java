@@ -11,6 +11,7 @@ import com.example.entity.vo.response.*;
 import com.example.mapper.ClientDetailMapper;
 import com.example.mapper.ClientMapper;
 import com.example.mapper.ClientSshMapper;
+import com.example.service.AccountService;
 import com.example.service.ClientService;
 import com.example.utils.Const;
 import com.example.utils.InfluxDbUtils;
@@ -48,6 +49,9 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
 
     @Resource
     StringRedisTemplate stringRedisTemplate;
+
+    @Resource
+    AccountService accountService;
 
     @PostConstruct
     public void initClientCache() {
@@ -217,8 +221,9 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
             rabbitTemplate.convertAndSend(Const.MQ_WARN, data);
         });
 
-        //测试用
-        Map<String, Object> data = Map.of("id",clientId,"data", warnProcessInfos, "email", "1479539484@qq.com");
+        String adminEmail = accountService.getAdminEmail();
+        //直接发送给管理员
+        Map<String, Object> data = Map.of("id",clientId,"data", warnProcessInfos, "email", adminEmail);
         rabbitTemplate.convertAndSend(Const.MQ_WARN, data);
         //放入redis防止10分钟内重复发送
         stringRedisTemplate.opsForValue().set(Const.MQ_WARN + clientId, "1", 10, TimeUnit.MINUTES);
