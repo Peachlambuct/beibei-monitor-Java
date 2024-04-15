@@ -2,48 +2,54 @@ package com.example.controller;
 
 import com.example.entity.RestBean;
 import com.example.entity.dto.Client;
-import com.example.entity.dto.WarnProcessInfo;
+import com.example.entity.dto.ClientWarnRules;
 import com.example.entity.vo.request.ClientDetailVO;
 import com.example.entity.vo.request.RuntimeDetailVO;
+import com.example.entity.vo.request.WarnVO;
 import com.example.service.ClientService;
+import com.example.service.ClientWarnRulesService;
+import com.example.service.ClientWarnService;
 import com.example.utils.Const;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import retrofit2.http.GET;
 
 @RestController
 @RequestMapping("/monitor")
 public class ClientController {
 
     @Resource
-    ClientService service;
+    ClientService clientService;
+
+    @Resource
+    ClientWarnService clientWarnService;
+
 
     @GetMapping("/register")
     public RestBean<Void> registerClient(@RequestHeader("Authorization") String token) {
-        return service.verifyAndRegister(token) ?
+        return clientService.verifyAndRegister(token) ?
                 RestBean.success() : RestBean.failure(401, "客户端注册失败，请检查Token是否正确");
     }
 
     @PostMapping("/detail")
     public RestBean<Void> updateClientDetails(@RequestAttribute(Const.ATTR_CLIENT) Client client,
                                               @RequestBody @Valid ClientDetailVO vo) {
-        service.updateClientDetail(vo, client);
+        clientService.updateClientDetail(vo, client);
         return RestBean.success();
     }
 
     @PostMapping("/runtime")
     public RestBean<Void> updateRuntimeDetails(@RequestAttribute(Const.ATTR_CLIENT) Client client,
                                                @RequestBody @Valid RuntimeDetailVO vo) {
-        service.updateRuntimeDetail(vo, client);
+        clientService.updateRuntimeDetail(vo, client);
         return RestBean.success();
     }
 
     @PostMapping("/processWarn")
-    public RestBean<Void> processWarn(@RequestBody List<WarnProcessInfo> warnProcessInfos,
+    public RestBean<Void> processWarn(@RequestBody WarnVO warnVO,
                                       @RequestAttribute(Const.ATTR_CLIENT) Client client) {
-        service.processWarn(warnProcessInfos,client.getId());
+        clientWarnService.processWarn(warnVO,client.getId());
         return RestBean.success();
     }
 }

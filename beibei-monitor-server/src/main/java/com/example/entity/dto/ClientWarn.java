@@ -17,5 +17,4 @@ public class ClientWarn implements BaseData {
     String detail;  //警告详细信息
     Date time;  //警告时间
     String description; //警告描述
-    Integer status; //警告状态（0为未警告，1为警告）
 }

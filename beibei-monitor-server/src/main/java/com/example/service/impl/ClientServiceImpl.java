@@ -2,17 +2,11 @@ package com.example.service.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.example.entity.dto.Client;
-import com.example.entity.dto.ClientDetail;
-import com.example.entity.dto.ClientSsh;
-import com.example.entity.dto.WarnProcessInfo;
+import com.example.entity.dto.*;
 import com.example.entity.vo.request.*;
 import com.example.entity.vo.response.*;
-import com.example.mapper.ClientDetailMapper;
-import com.example.mapper.ClientMapper;
-import com.example.mapper.ClientSshMapper;
+import com.example.mapper.*;
 import com.example.service.ClientService;
-import com.example.utils.Const;
 import com.example.utils.InfluxDbUtils;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
@@ -24,7 +18,6 @@ import org.springframework.stereotype.Service;
 import java.security.SecureRandom;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 
 @Service
 public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> implements ClientService {
@@ -42,12 +35,6 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
 
     @Resource
     ClientSshMapper sshMapper;
-
-    @Resource
-    AmqpTemplate rabbitTemplate;
-
-    @Resource
-    StringRedisTemplate stringRedisTemplate;
 
     @PostConstruct
     public void initClientCache() {
@@ -195,33 +182,6 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
         }
         vo.setIp(detail.getIp());
         return vo;
-    }
-
-    /**
-     * 处理告警信息
-     * 还差一个形参是拥有这个服务器的用户email
-     * 杭州哥哥写，WarnProcessInfo是我Rust返回的进程类，我会返回top5的进程
-     * 在MonitorController里的接口叫/processWarn
-     * 作用是提交错误信息到rabbitmq里然后由rabbitmq来处理
-     * @param warnProcessInfos top5进程
-     * @param clientId 服务器id
-     */
-    @Override
-    public void processWarn(List<WarnProcessInfo> warnProcessInfos, int clientId) {
-        // 这里应该是发送到rabbitmq
-        //根据clientId获取负责节点人的email
-        if (stringRedisTemplate.opsForValue().get(Const.MQ_WARN + clientId) != null) return;
-
-        baseMapper.findEmailsByClientId(clientId).forEach(email -> {
-            Map<String, Object> data = Map.of("id",clientId,"data", warnProcessInfos, "email", email);
-            rabbitTemplate.convertAndSend(Const.MQ_WARN, data);
-        });
-
-        //测试用
-        Map<String, Object> data = Map.of("id",clientId,"data", warnProcessInfos, "email", "1479539484@qq.com");
-        rabbitTemplate.convertAndSend(Const.MQ_WARN, data);
-        //放入redis防止10分钟内重复发送
-        stringRedisTemplate.opsForValue().set(Const.MQ_WARN + clientId, "1", 10, TimeUnit.MINUTES);
     }
 
     private boolean isOnline(RuntimeDetailVO runtime) {
