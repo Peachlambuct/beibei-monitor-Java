@@ -5,7 +5,7 @@ springdoc:
     operations-sorter: alpha
 spring:
   influx:
-    url: http://192.168.41.200:8086
+    url: http://192.168.23.5:8086
     user: beibei
     password: Aa123456
   mail:
@@ -13,14 +13,14 @@ spring:
     username: 17784774733@163.com
     password: CXFLNTXKRTWXQNRP
   rabbitmq:
-    addresses: 192.168.41.200
-    username: admin
-    password: admin
+    addresses: 192.168.23.5:5673
+    username: guest
+    password: guest
     virtual-host: /
   datasource:
     url: jdbc:mysql://localhost:3306/monitor
     username: root
-    password: 123456
+    password: 1234
     driver-class-name: com.mysql.cj.jdbc.Driver
   security:
     jwt:
@@ -37,7 +37,7 @@ spring:
       mail-limit: 60
     flow:
       period: 5
-      limit: 100
+      limit: 10000
       block: 30
     cors:
       origin: '*'
@@ -45,4 +45,5 @@ spring:
       methods: '*'
   data:
     redis:
-      host: 192.168.41.200
+      host: 192.168.23.5
+      port: 6379

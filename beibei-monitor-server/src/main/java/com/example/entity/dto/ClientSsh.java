@@ -9,8 +9,10 @@ import lombok.Data;
 @TableName("db_client_ssh")
 public class ClientSsh implements BaseData {
     @TableId
-    Integer id;
-    Integer port;
-    String username;
-    String password;
+    Integer id; //ssh连接id
+    Integer userId; //用户id
+    Integer clintId;  //客户端id
+    Integer port;   //ssh连接端口
+    String username;    //ssh连接的客户端账号名
+    String password;    //ssh连接的客户端密码
 }

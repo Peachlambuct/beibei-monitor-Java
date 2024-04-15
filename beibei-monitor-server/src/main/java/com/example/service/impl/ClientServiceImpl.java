@@ -218,7 +218,7 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
         });
 
         //测试用
-        Map<String, Object> data = Map.of("id",clientId,"data", warnProcessInfos, "email", "1479539484@qq.com");
+        Map<String, Object> data = Map.of("id",clientId,"data", warnProcessInfos, "email", "2727402548@qq.com");
         rabbitTemplate.convertAndSend(Const.MQ_WARN, data);
         //放入redis防止10分钟内重复发送
         stringRedisTemplate.opsForValue().set(Const.MQ_WARN + clientId, "1", 10, TimeUnit.MINUTES);
