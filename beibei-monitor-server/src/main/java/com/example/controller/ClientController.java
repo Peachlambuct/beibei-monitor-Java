@@ -43,7 +43,6 @@ public class ClientController {
     @PostMapping("/processWarn")
     public RestBean<Void> processWarn(@RequestBody List<WarnProcessInfo> warnProcessInfos,
                                       @RequestAttribute(Const.ATTR_CLIENT) Client client) {
-        System.out.println(warnProcessInfos);
         service.processWarn(warnProcessInfos,client.getId());
         return RestBean.success();
     }

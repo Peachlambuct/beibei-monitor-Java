@@ -27,31 +27,31 @@ const checkedNodes = ref([])
 
     <el-timeline style="max-width: 600px">
       <el-timeline-item timestamp="2018/4/12" placement="top">
-        <el-card>
+        <el-card class="taskCard">
           <h4>Update Github template</h4>
           <p>Tom committed 2018/4/12 20:46</p>
         </el-card>
       </el-timeline-item>
       <el-timeline-item timestamp="2018/4/3" placement="top">
-        <el-card>
+        <el-card class="taskCard">
           <h4>Update Github template</h4>
           <p>Tom committed 2018/4/3 20:46</p>
         </el-card>
       </el-timeline-item>
       <el-timeline-item timestamp="2018/4/2" placement="top">
-        <el-card>
+        <el-card class="taskCard">
           <h4>Update Github template</h4>
           <p>Tom committed 2018/4/2 20:46</p>
         </el-card>
       </el-timeline-item>
       <el-timeline-item timestamp="2018/4/1" placement="top">
-        <el-card>
+        <el-card class="taskCard">
           <h4>Update Github template</h4>
           <p>Tom committed 2018/4/2 20:46</p>
         </el-card>
       </el-timeline-item>
       <el-timeline-item timestamp="2018/3/2" placement="top">
-        <el-card>
+        <el-card class="taskCard">
           <h4>Update Github template</h4>
           <p>Tom committed 2018/4/2 20:46</p>
         </el-card>
@@ -61,5 +61,7 @@ const checkedNodes = ref([])
 </template>
 
 <style scoped>
-
+.taskCard {
+  background-image: linear-gradient(to right, #d4eaf7, #d6d6d6);
+}
 </style>

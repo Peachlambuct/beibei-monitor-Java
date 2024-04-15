@@ -217,7 +217,6 @@ function deleteAccount(id) {
   .title {
     font-size: 18px;
     font-weight: bold;
-    color: dodgerblue;
   }
 }
 

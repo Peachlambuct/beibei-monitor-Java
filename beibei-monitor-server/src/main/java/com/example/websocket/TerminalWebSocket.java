@@ -48,14 +48,14 @@ public class TerminalWebSocket {
 
     @OnOpen
     public void onOpen(Session session,
-                        @PathParam(value = "clientId") String clientId) throws Exception {
+                       @PathParam(value = "clientId") String clientId) throws Exception {
         ClientDetail detail = detailMapper.selectById(clientId);
         ClientSsh ssh = sshMapper.selectById(clientId);
-        if(detail == null || ssh == null) {
+        if (detail == null || ssh == null) {
             session.close(new CloseReason(CloseReason.CloseCodes.CANNOT_ACCEPT, "无法识别此主机"));
             return;
         }
-        if(this.createSshConnection(session, ssh, detail.getIp())) {
+        if (this.createSshConnection(session, ssh, detail.getIp())) {
             log.info("主机 {} 的SSH连接已创建", detail.getIp());
         }
     }
@@ -71,7 +71,7 @@ public class TerminalWebSocket {
     @OnClose
     public void onClose(Session session) throws IOException {
         Shell shell = sessionMap.get(session);
-        if(shell != null) {
+        if (shell != null) {
             shell.close();
             sessionMap.remove(session);
             log.info("主机 {} 的SSH连接已断开", shell.js.getHost());
@@ -84,7 +84,7 @@ public class TerminalWebSocket {
         session.close();
     }
 
-    private boolean createSshConnection(Session session, ClientSsh ssh, String ip) throws IOException{
+    private boolean createSshConnection(Session session, ClientSsh ssh, String ip) throws IOException {
         try {
             JSch jSch = new JSch();
             com.jcraft.jsch.Session js = jSch.getSession(ssh.getUsername(), ip, ssh.getPort());
@@ -99,11 +99,11 @@ public class TerminalWebSocket {
             return true;
         } catch (JSchException e) {
             String message = e.getMessage();
-            if(message.equals("Auth fail")) {
+            if (message.equals("Auth fail")) {
                 session.close(new CloseReason(CloseReason.CloseCodes.CANNOT_ACCEPT,
                         "登录SSH失败，用户名或密码错误"));
                 log.error("连接SSH失败，用户名或密码错误，登录失败");
-            } else if(message.contains("Connection refused")) {
+            } else if (message.contains("Connection refused")) {
                 session.close(new CloseReason(CloseReason.CloseCodes.CANNOT_ACCEPT,
                         "连接被拒绝，可能是没有启动SSH服务或是放开端口"));
                 log.error("连接SSH失败，连接被拒绝，可能是没有启动SSH服务或是放开端口");
