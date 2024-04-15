@@ -37,7 +37,7 @@
       </el-form>
     </div>
     <div style="margin-top: 40px">
-      <el-button @click="userLogin()" style="width: 270px" type="success" plain>立即登录</el-button>
+      <el-button  @keydown.enter="userLogin"  @click="userLogin()" style="width: 270px" type="success" plain>立即登录</el-button>
     </div>
   </div>
 </template>

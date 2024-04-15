@@ -95,4 +95,14 @@ const initSubAccounts = () =>
   }
 }
 
+.account-card {
+  border-radius: 5px;
+  background-color: #dde9eb;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  text-align: left;
+  margin: 10px 0;
+}
+
 </style>
