@@ -15,12 +15,7 @@ const registerTable = reactive({
   cpuWarn: 80,
   memoryWarn: 80,
 })
-const serverList = [
-  {label: '服务器1', value: '69519410'},
-  {label: '服务器2', value: 'server2'},
-  {label: '服务器36', value: 'server3'},
-  {label: '服务器4', value: 'server4'},
-]
+const serverList = ref([])
 
 
 const warnList = ref([])
@@ -29,8 +24,19 @@ function getWarnList() {
     warnList.value = list
   })
 }
-getWarnList()
 
+function getServerNameList() {
+  get('/api/monitor/list', list => {
+    serverList.length = 0
+    list.forEach(item => {
+      serverList.value.push({label: item.name, value: item.id})
+    })
+    console.info(serverList.value)
+  })
+}
+
+getWarnList()
+getServerNameList()
 function registerWarnRule() {
   post('/api/warnRules/addWarnRule', registerTable, () => {
     ElMessage.success('预警规则添加成功')

@@ -32,6 +32,7 @@ function init(warnRule) {
 function deleteWarnRule(id) {
   get(`/api/warnRules/deleteWarnRule?id=${id}`, () => {
     ElMessage.success('预警规则删除成功')
+    emit('update-warn-rule')
   })
 }
 
@@ -70,7 +71,7 @@ function updateRule() {
     </div>
     <div class="button-container">
       <el-button style="float: right;margin-right: 10px" :icon="Delete" color="#f5f5e9"
-                 @click="deleteWarnRule">删除
+                 @click="deleteWarnRule(warnRule.id)">删除
       </el-button>
       <el-button style="float: right;margin-right: 10px;margin-top: 10px" :icon="Edit" color="#f5f5e9"
                  @click="init(warnRule)">修改预警阈值
