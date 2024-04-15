@@ -4,7 +4,9 @@ import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.entity.dto.ClientWarn;
 import com.example.entity.dto.ClientWarnRules;
+import com.example.entity.dto.WarnProcessInfo;
 import com.example.entity.vo.request.WarnVO;
+import com.example.entity.vo.response.ClientWarnVO;
 import com.example.mapper.ClientMapper;
 import com.example.mapper.ClientWarnMapper;
 import com.example.mapper.ClientWarnRulesMapper;
@@ -12,13 +14,13 @@ import com.example.service.ClientWarnService;
 import com.example.utils.Const;
 import jakarta.annotation.Resource;
 import org.springframework.amqp.core.AmqpTemplate;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.Map;
-import java.util.Objects;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -34,6 +36,21 @@ public class ClientWarnServiceImpl extends ServiceImpl<ClientWarnMapper, ClientW
 
     @Resource
     StringRedisTemplate stringRedisTemplate;
+
+
+    @Override
+    public List<ClientWarnVO> listAllWarn() {
+        List<ClientWarn> clientWarns = this.list();
+        List<ClientWarnVO> clientWarnVOS = new ArrayList<>();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        clientWarns.forEach(clientWarn -> {
+            ClientWarnVO clientWarnVO = new ClientWarnVO();
+            BeanUtils.copyProperties(clientWarn, clientWarnVO);
+            clientWarnVO.setTime(format.format(clientWarn.getTime()));
+            clientWarnVOS.add(clientWarnVO);
+        });
+        return clientWarnVOS;
+    }
 
     /**
      * 处理告警信息
