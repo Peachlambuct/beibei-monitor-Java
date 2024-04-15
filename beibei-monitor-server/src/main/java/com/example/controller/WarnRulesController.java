@@ -3,6 +3,7 @@ package com.example.controller;
 
 import com.example.entity.RestBean;
 import com.example.entity.dto.ClientWarnRules;
+import com.example.entity.vo.response.ClientWarnRulesVO;
 import com.example.service.ClientWarnRulesService;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
@@ -35,7 +36,7 @@ public class WarnRulesController {
     }
 
     @GetMapping("/list")
-    public RestBean<List<ClientWarnRules>> listAllWarnRules() {
-        return RestBean.success(clientWarnRulesService.list());
+    public RestBean<List<ClientWarnRulesVO>> listAllWarnRules() {
+        return RestBean.success(clientWarnRulesService.listAllWarnRules());
     }
 }
