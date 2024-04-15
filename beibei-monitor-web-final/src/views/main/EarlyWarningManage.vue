@@ -3,6 +3,8 @@
 import {Plus} from "@element-plus/icons-vue";
 import WarnCard from "@/component/WarnCard.vue";
 import {reactive, ref} from "vue";
+import {get, post} from "@/net";
+import {ElMessage} from "element-plus";
 
 const addWarn = ref(false)
 const registerTable = reactive({
@@ -14,14 +16,27 @@ const registerTable = reactive({
   memoryWarn: 80,
 })
 const serverList = [
-  {label: '服务器1', value: 'server1'},
+  {label: '服务器1', value: '69519410'},
   {label: '服务器2', value: 'server2'},
   {label: '服务器36', value: 'server3'},
   {label: '服务器4', value: 'server4'},
 ]
 
-const handleChange = (value) => {
-  console.log('Threshold value changed to: ', value);
+
+const warnList = ref([])
+function getWarnList() {
+  get('/api/warnRules/list', list => {
+    warnList.value = list
+  })
+}
+getWarnList()
+
+function registerWarnRule() {
+  post('/api/warnRules/addWarnRule', registerTable, () => {
+    ElMessage.success('预警规则添加成功')
+    getWarnList()
+    addWarn.value = false
+  })
 }
 </script>
 
@@ -62,37 +77,33 @@ const handleChange = (value) => {
         <div>
           <el-form label-width="150px">
             <el-form-item label="预警规则名称">
-              <el-input v-model="registerTable.ruleName"/>
+              <el-input v-model="registerTable.name"/>
             </el-form-item>
             <el-form-item label="预警规则描述">
-              <el-input v-model="registerTable.ruleDesc"/>
+              <el-input v-model="registerTable.description"/>
             </el-form-item>
             <el-form-item label="CPU预警规则阈值">
-              <el-input-number v-model="registerTable.cpuThreshold" :min="80" :max="100" @change="handleChange"/>
+              <el-input-number v-model="registerTable.cpuWarn" :min="80" :max="100"/>
             </el-form-item>
             <el-form-item label="内存预警规则阈值">
-              <el-input-number v-model="registerTable.memoryThreshold" :min="80" :max="100" @change="handleChange"/>
+              <el-input-number v-model="registerTable.memoryWarn" :min="80" :max="100"/>
             </el-form-item>
             <el-form-item label="预警规则触发服务器">
-              <el-select v-model="registerTable.ruleServer" placeholder="请选择">
+              <el-select v-model="registerTable.clientId" placeholder="请选择">
                 <el-option v-for="item in serverList" :label="item.label" :value="item.value"/>
               </el-select>
             </el-form-item>
           </el-form>
         </div>
         <div style="display: flex; justify-content: flex-end; align-items: flex-end; width: 100%;">
-          <el-button type="success">保存</el-button>
-          <el-button type="danger">取消</el-button>
+          <el-button type="success" @click="registerWarnRule">保存</el-button>
+          <el-button type="danger" @click="addWarn = false">取消</el-button>
         </div>
       </div>
     </el-dialog>
 
     <div style="display: flex; flex-direction: row; flex-wrap: wrap;">
-      <WarnCard/>
-      <WarnCard/>
-      <WarnCard/>
-      <WarnCard/>
-      <WarnCard/>
+      <WarnCard v-for="item in warnList" :warn-rule="item" @update-warn-rule="getWarnList"/>
     </div>
   </div>
 </template>

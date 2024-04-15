@@ -25,10 +25,10 @@ public class ClientWarnRulesServiceImpl extends ServiceImpl<ClientWarnRulesMappe
     @Override
     public void updateWarnRule(ClientWarnRules warnRule) {
         this.update().eq("id",warnRule.getId())
-                .set("clientId",warnRule.getClientId())
+                .set("client_id",warnRule.getClientId())
                 .set("name",warnRule.getName())
-                .set("cpuWarn",warnRule.getCpuWarn())
-                .set("memoryWarn",warnRule.getMemoryWarn())
+                .set("cpu_warn",warnRule.getCpuWarn())
+                .set("memory_warn",warnRule.getMemoryWarn())
                 .set("description",warnRule.getDescription()).update();
     }
 
