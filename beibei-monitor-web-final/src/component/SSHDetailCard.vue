@@ -7,8 +7,10 @@ import {Delete} from "@element-plus/icons-vue";
   <div class="card">
     <div style="margin-left: 20px">
       <div style="font-weight: bold;font-size: 20px">XXX服务器</div>
-      <div>在线状态：在线</div>
-      <div>CPU：80 | Memory：20</div>
+      <div style="color: gray;font-size: 14px">
+        <div>在线状态：在线</div>
+        <div>CPU：80 | Memory：20</div>
+      </div>
     </div>
     <div class="button-container">
       <el-button style="float: right;margin-right: 10px" color="#f5f5e9" :icon="Delete" type="primary"
@@ -21,7 +23,7 @@ import {Delete} from "@element-plus/icons-vue";
 
 <style scoped>
 .card {
-  background-image: linear-gradient(to right, #d4eaf7, #d6d6d6);
+  background-image: linear-gradient(to right, rgba(212, 234, 247, 0.6), #d6d6d6);
   height: 100px;
   width: 45%;
   border-radius: 10px;

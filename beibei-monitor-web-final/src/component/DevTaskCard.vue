@@ -34,7 +34,7 @@ import {Delete} from "@element-plus/icons-vue";
 
 <style scoped>
 .card {
-  background-image: linear-gradient(to right, #fafaf4, #f5f5e9);
+  background-image: linear-gradient(to right, #efeeee, #f8f8f8);
   height: 250px;
   width: 45%;
   border-radius: 10px;
