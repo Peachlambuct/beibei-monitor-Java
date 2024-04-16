@@ -61,7 +61,7 @@ public class DevelopServiceImpl extends ServiceImpl<DevelopTaskMapper, DevelopTa
         List<TaskListVO> taskListVOS = new ArrayList<>();
         List<DevelopTask> tasks;
         // 获取主任务
-        tasks = Const.ROLE_ADMIN.equals(role.substring(5)) ? this.list() : developTaskMapper.getAllByUserId(userId);
+        tasks = Const.ROLE_ADMIN.equals(role.substring(5))?this.list():developTaskMapper.getAllByUserId(userId);
         // 遍历主任务，分别获取子任务，任务相关用户id和姓名，任务相关客户端id和名称
         for (DevelopTask task : tasks) {
             // 获取任务相关用户id列表
