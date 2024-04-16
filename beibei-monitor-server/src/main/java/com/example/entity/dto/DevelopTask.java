@@ -4,12 +4,15 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.example.entity.BaseData;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
 @TableName("db_develop_task")
+@AllArgsConstructor
 public class DevelopTask implements BaseData {
     @TableId(type = IdType.AUTO)
     Integer id;  //任务id

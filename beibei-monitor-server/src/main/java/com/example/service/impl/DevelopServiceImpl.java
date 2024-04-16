@@ -1,12 +1,11 @@
 package com.example.service.impl;
 
+import com.alibaba.fastjson2.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.entity.dto.DevelopSubtask;
 import com.example.entity.dto.DevelopTask;
-import com.example.entity.vo.request.SubtaskAddVO;
-import com.example.entity.vo.request.TaskAddVO;
-import com.example.entity.vo.request.TaskListVO;
+import com.example.entity.vo.request.*;
 import com.example.mapper.DevelopSubtaskMapper;
 import com.example.mapper.DevelopTaskMapper;
 import com.example.service.DevelopService;
@@ -31,9 +30,9 @@ public class DevelopServiceImpl extends ServiceImpl<DevelopTaskMapper, DevelopTa
     @Override
     @Transactional
     public void addTask(TaskAddVO task) {
-        DevelopTask developTask = new DevelopTask();
+        DevelopTask developTask = new DevelopTask(null, task.getName(), task.getPrincipalName(), task.getType(),
+                task.getDescription(), JSONArray.copyOf(task.getAboutClientId()).toJSONString(), task.getStartTime(), task.getEndTime(), null);
         List<SubtaskAddVO> subtasks = task.getSubtasks();
-        BeanUtils.copyProperties(task, developTask);
         this.save(developTask);
 
         for (SubtaskAddVO subtask : subtasks) {
@@ -63,5 +62,29 @@ public class DevelopServiceImpl extends ServiceImpl<DevelopTaskMapper, DevelopTa
             taskListVOS.add(taskListVO);
         }
         return taskListVOS;
+    }
+
+    @Override
+    @Transactional
+    public void deleteTask(Integer taskId) {
+        this.removeById(taskId);
+        subtaskMapper.delete(new QueryWrapper<DevelopSubtask>().eq("task_id", taskId));
+    }
+
+    @Override
+    public void updateTask(TaskUpdateVO task) {
+        DevelopTask developTask = new DevelopTask(null, task.getName(), task.getPrincipalName(), task.getType(),
+                task.getDescription(), JSONArray.copyOf(task.getAboutClientId()).toJSONString(), task.getStartTime(), task.getEndTime(), null);
+        this.updateById(developTask);
+        task.getSubtasks().forEach(subtask -> {
+            DevelopSubtask developSubtask = new DevelopSubtask();
+            BeanUtils.copyProperties(subtask, developSubtask);
+            subtaskMapper.update(developSubtask, new QueryWrapper<DevelopSubtask>().eq("id", subtask.getId()));
+        });
+    }
+
+    @Override
+    public void deleteSubtask(Integer subtaskId) {
+        subtaskMapper.deleteById(subtaskId);
     }
 }

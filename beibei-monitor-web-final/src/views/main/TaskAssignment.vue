@@ -2,6 +2,68 @@
 
 import {Plus} from "@element-plus/icons-vue";
 import TaskCard from "@/component/TaskCard.vue";
+import {reactive, ref} from "vue";
+import {get, post} from "@/net";
+import {ElMessage} from "element-plus";
+import {osNameToIcon} from "@/tools";
+import {useStore} from "@/store";
+
+const show = ref(false);
+
+let mainTask = ref({
+  name: '',
+  type: '',
+  description: '',
+  principalName: '',
+  startTime: '',
+  endTime: '',
+  aboutClientId: [],
+  subtasks: []
+});
+const store = useStore();
+const taskList = ref([])
+const simpleList = ref([])
+const onCheck = (state, id) => {
+  if(state) {
+    mainTask.value.aboutClientId.push(id)
+  } else {
+    const index = mainTask.value.aboutClientId.indexOf(id);
+    mainTask.value.aboutClientId.splice(index, 1)
+  }
+}
+if(store.isAdmin) {
+  get('/api/monitor/simple-list', list => {
+    simpleList.value = list
+  })
+}
+function getTaskList() {
+  get("/api/task/list", (res) => {
+    taskList.value = res
+  })
+}
+getTaskList()
+function addSubTask() {
+  mainTask.value.subtasks.push({
+    name: '',
+    description: '',
+    principalName: '',
+    startTime: '',
+    endTime: '',
+  });
+}
+
+function addTask() {
+  post("/api/task/addTask", mainTask.value, (res) => {
+    ElMessage.success("添加成功")
+  })
+  console.log(mainTask.value)
+  show.value = false
+}
+
+function removeSubTask(index) {
+  mainTask.value.subtasks.splice(index, 1)
+}
+
 </script>
 
 <template>
@@ -17,19 +79,100 @@ import TaskCard from "@/component/TaskCard.vue";
       </div>
       <div>
         <el-button color="#b6ccd8" :icon="Plus" type="primary"
-                   @click="register.show = true">添加新的任务</el-button>
+                   @click="show = true">添加新的任务</el-button>
       </div>
     </div>
     <el-divider style="margin: 10px 0"/>
 
+    <el-dialog v-model="show" width="600">
+      <div style="display: flex; flex-direction: column">
+        <div style="font-size: 24px;color: #606060">主任务</div>
+        <el-form style="margin-top: 10px">
+          <el-input v-model="mainTask.name" placeholder="请输入任务名称" style="margin-bottom: 10px"/>
+          <el-input v-model="mainTask.type" placeholder="请输入任务类型" style="margin-bottom: 10px"/>
+          <el-input v-model="mainTask.description" placeholder="请输入任务描述" style="margin-bottom: 10px"/>
+          <el-input v-model="mainTask.principalName" placeholder="请输入任务负责人" style="margin-bottom: 10px"/>
+          <el-date-picker
+              v-model="mainTask.startTime"
+              type="date"
+              placeholder="选择日期"
+              style="margin-bottom: 10px"
+          ></el-date-picker>
+          <el-date-picker
+              v-model="mainTask.endTime"
+              type="date"
+              placeholder="选择日期"
+              style="margin-bottom: 10px;margin-left: 10px"
+          ></el-date-picker>
+          <el-scrollbar max-height="200">
+            <div class="client-card" v-for="item in simpleList">
+              <el-checkbox @change="state => onCheck(state, item.id)"/>
+              <div style="margin-left: 20px">
+                <div style="font-size: 14px;font-weight: bold">
+                  <span :class="`flag-icon flag-icon-${item.location}`"></span>
+                  <span style="margin: 0 10px">{{ item.name }}</span>
+                </div>
+                <div style="font-size: 12px;color: grey">
+                  操作系统:
+                  <i :style="{color: osNameToIcon(item.osName).color}"
+                     :class="`fa-brands ${osNameToIcon(item.osName).icon}`"></i>
+                  {{`${item.osName} ${item.osVersion}`}}
+                </div>
+                <div style="font-size: 12px;color: grey">
+                  <span style="margin-right: 10px">公网IP: {{item.ip}}</span>
+                </div>
+              </div>
+            </div>
+          </el-scrollbar>
+        </el-form>
+        <div style="font-size: 20px;color: gray">{{mainTask.subtasks.length > 0 ? '子任务列表': ''}}</div>
+        <el-form style="margin-top: 10px">
+          <div v-for="(subTask, index) in mainTask.subtasks" :key="index" style="margin-top: 40px">
+            <el-input v-model="subTask.name" placeholder="请输入任务名称" style="margin-bottom: 10px"/>
+            <el-input v-model="subTask.description" placeholder="请输入任务描述" style="margin-bottom: 10px"/>
+            <el-input v-model="subTask.principalName" placeholder="请输入任务负责人" style="margin-bottom: 10px"/>
+            <el-date-picker
+                v-model="subTask.startTime"
+                type="date"
+                placeholder="选择日期"
+                style="margin-bottom: 10px"
+            ></el-date-picker>
+            <el-date-picker
+                v-model="subTask.endTime"
+                type="date"
+                placeholder="选择日期"
+                style="margin-bottom: 10px;margin-left: 10px"
+            ></el-date-picker>
+            <el-button style="float: right" type="primary" @click="removeSubTask(index)">删除</el-button>
+          </div>
+        </el-form>
+        <div class="button-container">
+          <el-button @click="addSubTask" type="primary">添加子任务</el-button>
+          <el-button @click="addTask" type="success">提交</el-button>
+          <el-button type="danger">取消</el-button>
+        </div>
+      </div>
+    </el-dialog>
+
     <div style="display: flex; flex-direction: row; flex-wrap: wrap;">
-      <TaskCard/>
-      <TaskCard/>
-      <TaskCard/>
+      <TaskCard @delete-task="getTaskList" v-for="item in taskList" :data="item"/>
     </div>
   </div>
 </template>
 
 <style scoped>
+.button-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
 
+.client-card {
+  border-radius: 5px;
+  background-color: var(--el-bg-color-page);
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  margin: 10px;
+}
 </style>
