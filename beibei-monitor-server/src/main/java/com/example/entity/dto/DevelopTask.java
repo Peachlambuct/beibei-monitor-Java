@@ -1,5 +1,7 @@
 package com.example.entity.dto;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.example.entity.BaseData;
 import lombok.Data;
@@ -9,10 +11,9 @@ import java.util.Date;
 @Data
 @TableName("db_develop_task")
 public class DevelopTask implements BaseData {
-    String id;  //任务id
+    @TableId(type = IdType.AUTO)
+    Integer id;  //任务id
     String name;    //任务名称
-    Integer principalId;    //负责人id
-    Integer subtaskId;  //子任务id
     String principalName;   //负责人姓名
     String type;    //任务类型(例:测试)
     String description; //任务描述

@@ -6,6 +6,7 @@ import com.example.entity.dto.ClientWarnRules;
 import com.example.entity.vo.response.ClientWarnRulesVO;
 import com.example.mapper.ClientWarnRulesMapper;
 import com.example.service.ClientWarnRulesService;
+import com.example.utils.Const;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
@@ -38,7 +39,11 @@ public class ClientWarnRulesServiceImpl extends ServiceImpl<ClientWarnRulesMappe
     }
 
     @Override
-    public List<ClientWarnRulesVO> listAllWarnRules() {
-        return clientWarnRulesMapper.getAllList();
+    public List<ClientWarnRulesVO> listAllWarnRules(Integer userId,String role) {
+        if (Const.ROLE_ADMIN.equals(role.substring(5))){
+            return clientWarnRulesMapper.getAllList(userId);
+        }else {
+            return clientWarnRulesMapper.getListByUserId(userId);
+        }
     }
 }

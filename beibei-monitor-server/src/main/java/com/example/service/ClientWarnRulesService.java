@@ -10,5 +10,5 @@ public interface ClientWarnRulesService extends IService<ClientWarnRules> {
     void addWarnRule(ClientWarnRules warnRule);
     void updateWarnRule(ClientWarnRules warnRule);
     void deleteWarnRule(Integer id);
-    List<ClientWarnRulesVO> listAllWarnRules();
+    List<ClientWarnRulesVO> listAllWarnRules(Integer userId,String role);
 }

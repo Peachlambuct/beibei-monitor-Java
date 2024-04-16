@@ -14,6 +14,15 @@ public interface ClientWarnRulesMapper extends BaseMapper<ClientWarnRules> {
     @Select("select * from db_client_warn_rules where client_id = #{clientId}")
     ClientWarnRules getInfoByClientId(Integer clientId);
 
-    @Select("select db_client_warn_rules.*,db_client.name as clientName from db_client,db_client_warn_rules where db_client.id = db_client_warn_rules.client_id")
-    List<ClientWarnRulesVO> getAllList();
+    @Select("select db_client_warn_rules.*,db_client.name as clientName " +
+            "from db_client, db_client,db_client_warn_rules " +
+            "where db_client.id = db_client_warn_rules.client_id")
+    List<ClientWarnRulesVO> getAllList(Integer userId);
+
+    @Select("SELECT db_client_warn_rules.* " +
+            "FROM db_account " +
+            "JOIN db_client_warn_rules " +
+            "ON JSON_CONTAINS(db_account.clients, CAST(db_client_warn_rules.client_id AS JSON)) " +
+            "WHERE db_account.id = #{userId};")
+    List<ClientWarnRulesVO> getListByUserId(Integer userId);
 }
