@@ -10,7 +10,10 @@ import java.util.List;
 public class TaskListVO {
     Integer id;
     String name;
-    String principalNames;
+    List<Integer> principalIds;
+    List<String> principalNames;
+    List<Integer> aboutClientIds;
+    List<String> aboutClientNames;
     Double process;
     String type;
     String description;
