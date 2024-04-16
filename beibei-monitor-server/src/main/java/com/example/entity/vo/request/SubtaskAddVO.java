@@ -8,13 +8,11 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-@TableName("db_develop_subtask")
 public class SubtaskAddVO implements BaseData {
     String name;
-    String principalName;
     String description;
-    @JsonFormat(locale="zh", timezone="GMT+8", pattern="yyyy-MM-dd")
+    @JsonFormat(timezone="GMT+8", pattern="yyyy-MM-dd HH:mm:ss")
     Date startTime;
-    @JsonFormat(locale="zh", timezone="GMT+8", pattern="yyyy-MM-dd")
+    @JsonFormat(timezone="GMT+8", pattern="yyyy-MM-dd HH:mm:ss")
     Date endTime;
 }

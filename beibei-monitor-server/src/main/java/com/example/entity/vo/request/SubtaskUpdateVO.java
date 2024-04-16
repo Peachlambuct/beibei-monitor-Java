@@ -8,7 +8,6 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-@TableName("db_develop_subtask")
 public class SubtaskUpdateVO implements BaseData {
     Integer id;
     String name;

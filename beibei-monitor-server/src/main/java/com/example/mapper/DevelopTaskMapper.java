@@ -11,7 +11,6 @@ import java.util.List;
 public interface DevelopTaskMapper extends BaseMapper<DevelopTask> {
     @Select("SELECT db_develop_task.* " +
             "FROM db_develop_task " +
-            "JOIN db_account ON JSON_CONTAINS(db_account.clients, CAST(db_develop_task.about_client_id AS JSON)) " +
-            "WHERE db_account.id = #{userId};")
+            "WHERE JSON_CONTAINS(principal_ids, CAST(#{userId} AS JSON));")
     List<DevelopTask> getAllByUserId(Integer userId);
 }

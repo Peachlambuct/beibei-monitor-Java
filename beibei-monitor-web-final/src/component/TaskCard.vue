@@ -46,8 +46,26 @@ function deleteTask(id) {
       </div>
     </div>
 
-    <el-dialog v-model="show">
-      <div>{{data}}</div>
+    <el-dialog v-model="show" style="border-radius: 15px">
+      <div style="font-size: 23px;font-weight: bold">{{data.name}}</div>
+      <div style="font-size: 16px;font-weight: bold;margin-top: 10px">
+        <div>项目负责人：{{data.principalName}}</div>
+        <div>项目类型：{{data.type}}</div>
+        <div>项目描述：{{data.description}}</div>
+        <div>项目开始时间：{{data.startTime}}</div>
+        <div>项目结束时间：{{data.endTime}}</div>
+        <div>项目当前状态：<el-tag :type="data.status === 0 ? 'warning':'success'">{{data.status === 0 ? '未完成':'已完成'}}</el-tag></div>
+      </div>
+      <div v-if="data.subtasks.length > 0">
+        <div style="font-size: 18px;color: gray;margin-top: 10px">子任务列表</div>
+        <div style="font-size: 16px;font-weight: bold;margin-top: 10px" v-for="item in data.subtasks">
+          <div>项目负责人：{{item.principalName}}</div>
+          <div>项目描述：{{item.description}}</div>
+          <div>项目开始时间：{{item.startTime}}</div>
+          <div>项目结束时间：{{item.endTime}}</div>
+          <div>项目当前状态：<el-tag :type="item.status === 0 ? 'warning':'success'">{{item.status === 0 ? '未完成':'已完成'}}</el-tag></div>
+        </div>
+      </div>
     </el-dialog>
   </div>
 

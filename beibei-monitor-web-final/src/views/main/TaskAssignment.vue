@@ -55,6 +55,7 @@ function addSubTask() {
 function addTask() {
   post("/api/task/addTask", mainTask.value, (res) => {
     ElMessage.success("添加成功")
+    getTaskList()
   })
   console.log(mainTask.value)
   show.value = false

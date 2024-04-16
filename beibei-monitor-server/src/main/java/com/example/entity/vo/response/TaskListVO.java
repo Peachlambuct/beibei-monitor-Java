@@ -1,4 +1,4 @@
-package com.example.entity.vo.request;
+package com.example.entity.vo.response;
 
 import com.example.entity.dto.DevelopSubtask;
 import lombok.Data;
@@ -10,7 +10,8 @@ import java.util.List;
 public class TaskListVO {
     Integer id;
     String name;
-    String principalName;
+    String principalNames;
+    Double process;
     String type;
     String description;
     Date startTime;

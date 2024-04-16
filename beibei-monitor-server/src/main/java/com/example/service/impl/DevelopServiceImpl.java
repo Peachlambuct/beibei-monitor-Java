@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.entity.dto.DevelopSubtask;
 import com.example.entity.dto.DevelopTask;
 import com.example.entity.vo.request.*;
+import com.example.entity.vo.response.TaskListVO;
 import com.example.mapper.DevelopSubtaskMapper;
 import com.example.mapper.DevelopTaskMapper;
 import com.example.service.DevelopService;
@@ -30,7 +31,7 @@ public class DevelopServiceImpl extends ServiceImpl<DevelopTaskMapper, DevelopTa
     @Override
     @Transactional
     public void addTask(TaskAddVO task) {
-        DevelopTask developTask = new DevelopTask(null, task.getName(), task.getPrincipalName(), task.getType(),
+        DevelopTask developTask = new DevelopTask(null, task.getName(),  JSONArray.copyOf(task.getPrincipalIds()).toJSONString(), task.getType(),
                 task.getDescription(), JSONArray.copyOf(task.getAboutClientId()).toJSONString(), task.getStartTime(), task.getEndTime(), null);
         List<SubtaskAddVO> subtasks = task.getSubtasks();
         this.save(developTask);
@@ -73,7 +74,7 @@ public class DevelopServiceImpl extends ServiceImpl<DevelopTaskMapper, DevelopTa
 
     @Override
     public void updateTask(TaskUpdateVO task) {
-        DevelopTask developTask = new DevelopTask(null, task.getName(), task.getPrincipalName(), task.getType(),
+        DevelopTask developTask = new DevelopTask(null, task.getName(), JSONArray.copyOf(task.getPrincipalIds()).toJSONString(), task.getType(),
                 task.getDescription(), JSONArray.copyOf(task.getAboutClientId()).toJSONString(), task.getStartTime(), task.getEndTime(), null);
         this.updateById(developTask);
         task.getSubtasks().forEach(subtask -> {

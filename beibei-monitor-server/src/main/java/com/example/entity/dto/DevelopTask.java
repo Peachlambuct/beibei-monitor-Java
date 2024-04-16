@@ -17,7 +17,7 @@ public class DevelopTask implements BaseData {
     @TableId(type = IdType.AUTO)
     Integer id;  //任务id
     String name;    //任务名称
-    String principalName;   //负责人姓名
+    String principalIds;   //项目小组ids
     String type;    //任务类型(例:测试)
     String description; //任务描述
     String aboutClientId;   //任务相关服务器id

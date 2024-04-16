@@ -14,7 +14,7 @@ public class TaskUpdateVO {
     Integer id;
     @NotNull
     String name;
-    String principalName;
+    List<Integer> principalIds;
     String type;
     String description;
     List<Integer> aboutClientId;
