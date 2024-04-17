@@ -111,7 +111,7 @@ function initItem(data) {
   transition: .3s;
   &:hover {
     cursor: pointer;
-    transform: scale(1.05);
+    transform: scale(1.03);
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
   }
 }

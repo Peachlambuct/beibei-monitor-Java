@@ -36,7 +36,7 @@ getList()
       <el-divider style="margin: 10px 0"/>
 
       <div style="display: flex; flex-direction: row; flex-wrap: wrap;">
-        <DevTaskCard v-for="item in taskList" :data="item"/>
+        <DevTaskCard v-for="item in taskList" :data="item" @flash="getList"/>
       </div>
     </div>
   </div>
