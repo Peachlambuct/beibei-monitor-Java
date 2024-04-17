@@ -24,7 +24,7 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
 
     private String registerToken = this.generateNewToken();
 
-    private final Map<Integer, Client> clientIdCache = new ConcurrentHashMap<>();
+    final Map<Integer, Client> clientIdCache = new ConcurrentHashMap<>();
     private final Map<String, Client> clientTokenCache = new ConcurrentHashMap<>();
 
     @Resource
@@ -32,9 +32,6 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
 
     @Resource
     InfluxDbUtils influx;
-
-    @Resource
-    ClientSshMapper sshMapper;
 
     @PostConstruct
     public void initClientCache() {
@@ -84,7 +81,7 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
         }
     }
 
-    private final Map<Integer, RuntimeDetailVO> currentRuntime = new ConcurrentHashMap<>();
+    public final Map<Integer, RuntimeDetailVO> currentRuntime = new ConcurrentHashMap<>();
 
     @Override
     public void updateRuntimeDetail(RuntimeDetailVO vo, Client client) {
@@ -155,33 +152,6 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
         detailMapper.deleteById(clientId);
         this.initClientCache();
         currentRuntime.remove(clientId);
-    }
-
-    @Override
-    public void saveClientSshConnection(SshConnectionVO vo) {
-        Client client = clientIdCache.get(vo.getId());
-        if (client == null) return;
-        ClientSsh ssh = new ClientSsh();
-        BeanUtils.copyProperties(vo, ssh);
-        if (Objects.nonNull(sshMapper.selectById(client.getId()))) {
-            sshMapper.updateById(ssh);
-        } else {
-            sshMapper.insert(ssh);
-        }
-    }
-
-    @Override
-    public SshSettingsVO sshSettings(int clientId) {
-        ClientDetail detail = detailMapper.selectById(clientId);
-        ClientSsh ssh = sshMapper.selectById(clientId);
-        SshSettingsVO vo;
-        if (ssh == null) {
-            vo = new SshSettingsVO();
-        } else {
-            vo = ssh.asViewObject(SshSettingsVO.class);
-        }
-        vo.setIp(detail.getIp());
-        return vo;
     }
 
     private boolean isOnline(RuntimeDetailVO runtime) {

@@ -1,5 +1,6 @@
 package com.example.websocket;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.entity.dto.ClientDetail;
 import com.example.entity.dto.ClientSsh;
 import com.example.mapper.ClientDetailMapper;
@@ -50,7 +51,7 @@ public class TerminalWebSocket {
     public void onOpen(Session session,
                        @PathParam(value = "clientId") String clientId) throws Exception {
         ClientDetail detail = detailMapper.selectById(clientId);
-        ClientSsh ssh = sshMapper.selectById(clientId);
+        ClientSsh ssh = sshMapper.selectOne(new QueryWrapper<ClientSsh>().eq("client_id",clientId));
         if (detail == null || ssh == null) {
             session.close(new CloseReason(CloseReason.CloseCodes.CANNOT_ACCEPT, "无法识别此主机"));
             return;

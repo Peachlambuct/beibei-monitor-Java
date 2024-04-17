@@ -126,30 +126,6 @@ public class MonitorController {
         }
     }
 
-    @PostMapping("/ssh-save")
-    public RestBean<Void> saveSshConnection(@RequestBody @Valid SshConnectionVO vo,
-                                            @RequestAttribute(Const.ATTR_USER_ID) int userId,
-                                            @RequestAttribute(Const.ATTR_USER_ROLE) String userRole) {
-        if(this.permissionCheck(userId, userRole, vo.getId())) {
-            service.saveClientSshConnection(vo);
-            return RestBean.success();
-        } else {
-            return RestBean.noPermission();
-        }
-    }
-
-    @GetMapping("/ssh")
-    public RestBean<SshSettingsVO> sshSettings(int clientId,
-                                               @RequestAttribute(Const.ATTR_USER_ID) int userId,
-                                               @RequestAttribute(Const.ATTR_USER_ROLE) String userRole) {
-        if(this.permissionCheck(userId, userRole, clientId)) {
-            return RestBean.success(service.sshSettings(clientId));
-        } else {
-            return RestBean.noPermission();
-        }
-    }
-
-
     private List<Integer> accountAccessClients(int uid) {
         Account account = accountService.getById(uid);
         return account.getClientList();

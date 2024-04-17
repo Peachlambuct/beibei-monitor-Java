@@ -5,9 +5,7 @@ import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
 @Data
-public class SshConnectionVO {
-    Integer id;
-    String name;
+public class SshTestVO {
     @NotNull
     Integer port;
     @NotNull
@@ -18,4 +16,5 @@ public class SshConnectionVO {
     @NotNull
     @Length(min = 1)
     String password;
+    String ip;
 }
