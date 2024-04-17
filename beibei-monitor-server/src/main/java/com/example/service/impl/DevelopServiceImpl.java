@@ -66,7 +66,7 @@ public class DevelopServiceImpl extends ServiceImpl<DevelopTaskMapper, DevelopTa
         List<TaskListVO> taskListVOS = new ArrayList<>();
         List<DevelopTask> tasks;
         // 获取主任务
-        tasks = Const.ROLE_ADMIN.equals(role.substring(5))?this.list():developTaskMapper.getAllByUserId(userId);
+        tasks = Const.ROLE_ADMIN.equals(role.substring(5)) ? this.list() : developTaskMapper.getAllByUserId(userId);
         // 遍历主任务，分别获取子任务，任务相关用户id和姓名，任务相关客户端id和名称
         for (DevelopTask task : tasks) {
             // 获取任务相关用户id列表
@@ -102,7 +102,7 @@ public class DevelopServiceImpl extends ServiceImpl<DevelopTaskMapper, DevelopTa
             for (DevelopSubtask subtask : subtasks) {
                 if (subtask.getStatus() == 2) finished++;
             }
-            taskListVO.setProcess(finished *  1.0 / total);
+            taskListVO.setProcess(finished * 1.0 / total);
             taskListVOS.add(taskListVO);
         }
         return taskListVOS;
@@ -136,7 +136,7 @@ public class DevelopServiceImpl extends ServiceImpl<DevelopTaskMapper, DevelopTa
 
     @Override
     @Transactional
-    public void updateSubtaskStatus(SubtaskStatusVO subtaskStatusVO,Integer userId) {
+    public void updateSubtaskStatus(SubtaskStatusVO subtaskStatusVO, Integer userId) {
         // 创建一个UpdateWrapper实例
         UpdateWrapper<DevelopSubtask> updateWrapper = new UpdateWrapper<>();
         // 设置要更新的字段
@@ -152,17 +152,9 @@ public class DevelopServiceImpl extends ServiceImpl<DevelopTaskMapper, DevelopTa
     @Override
     public List<SubtaskVO> getAllSubtask(Integer userId, String role) {
         List<SubtaskVO> subtaskVOS = subtaskMapper.getSubtaskAndType();
-        if (!Const.ROLE_ADMIN.equals(role.substring(5))){
-            // 获取当前用户管理的客户端
-            List<Integer> clients = JSONArray.parseArray(accountMapper.getClientsById(userId),Integer.class);
-            // 删除不在当前用户下的任务
-            clients.forEach(clientId ->{
-                subtaskVOS.removeIf(subtaskVO ->
-                        JSONArray.parseArray(subtaskVO.getAboutClientId(), Integer.class)
-                                .stream()
-                                .filter(clients::contains)
-                                .toList().isEmpty());
-            });
+        if (!Const.ROLE_ADMIN.equals(role.substring(5))) {
+            List<Integer> taskIdList = developTaskMapper.getTaskIdsByUserId(userId);
+            subtaskVOS.removeIf(subtaskVO -> !taskIdList.contains(subtaskVO.getTaskId()));
         }
         return subtaskVOS;
     }
@@ -171,9 +163,9 @@ public class DevelopServiceImpl extends ServiceImpl<DevelopTaskMapper, DevelopTa
     @Transactional
     public void deleteExpiredTasks() {
         List<Integer> ids = developTaskMapper.getExpiredTaskIds();
-        if (!ids.isEmpty()){
+        if (!ids.isEmpty()) {
             developTaskMapper.deleteBatchIds(ids);
-            subtaskMapper.delete(new QueryWrapper<DevelopSubtask>().in("task_id",ids));
+            subtaskMapper.delete(new QueryWrapper<DevelopSubtask>().in("task_id", ids));
         }
     }
 

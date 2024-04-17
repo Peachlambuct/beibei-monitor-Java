@@ -20,4 +20,7 @@ public interface DevelopTaskMapper extends BaseMapper<DevelopTask> {
 
     @Select("SELECT name, status FROM db_develop_task WHERE JSON_CONTAINS(about_client_id, #{clientId})")
     List<SimpleTaskVO> selectTasksByClientId(String clientId);
+
+    @Select("SELECT id FROM db_develop_task WHERE JSON_CONTAINS(principal_ids, CAST(#{userId} AS JSON))")
+    List<Integer> getTaskIdsByUserId(Integer userId);
 }
