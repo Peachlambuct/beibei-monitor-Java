@@ -5,7 +5,6 @@ import com.example.entity.dto.Account;
 import com.example.entity.vo.request.RenameClientVO;
 import com.example.entity.vo.request.RenameNodeVO;
 import com.example.entity.vo.request.RuntimeDetailVO;
-import com.example.entity.vo.request.SshConnectionVO;
 import com.example.entity.vo.response.*;
 import com.example.service.AccountService;
 import com.example.service.ClientService;
@@ -24,6 +23,9 @@ public class MonitorController {
     ClientService service;
 
     @Resource
+    ClientService clientService;
+
+    @Resource
     AccountService accountService;
 
     @GetMapping("/list")
@@ -38,6 +40,12 @@ public class MonitorController {
                     .filter(vo -> ids.contains(vo.getId()))
                     .toList());
         }
+    }
+
+    @GetMapping("/clientNameList")
+    public RestBean<List<ClientNameVO>> getClientNameList(@RequestAttribute(Const.ATTR_USER_ID) Integer userId,
+                                                          @RequestAttribute(Const.ATTR_USER_ROLE) String role){
+        return RestBean.success(clientService.getClientNameList(userId,role));
     }
 
     @GetMapping("/simple-list")

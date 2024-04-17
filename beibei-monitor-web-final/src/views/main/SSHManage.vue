@@ -3,6 +3,7 @@
 import SSHDetailCard from "@/component/SSHDetailCard.vue";
 import {Delete, Plus} from "@element-plus/icons-vue";
 import {ref} from "vue";
+import {get} from "@/net";
 
 const locations = [
   {name: 'cn', desc: '中国大陆'},
@@ -14,6 +15,15 @@ const locations = [
   {name: 'de', desc: '德国'}
 ]
 const checkedNodes = ref([])
+
+const sshList = ref([])
+function getList() {
+  get('/api/ssh/list',data => {
+    sshList.value = data
+    console.info(sshList.value)
+  })
+}
+getList()
 </script>
 
 <template>
@@ -48,20 +58,7 @@ const checkedNodes = ref([])
     </div>
 
     <div style="display: flex; flex-direction: row; flex-wrap: wrap;">
-      <SSHDetailCard/>
-      <SSHDetailCard/>
-      <SSHDetailCard/>
-      <SSHDetailCard/>
-      <SSHDetailCard/>
-      <SSHDetailCard/>
-      <SSHDetailCard/>
-      <SSHDetailCard/>
-      <SSHDetailCard/>
-      <SSHDetailCard/>
-      <SSHDetailCard/>
-      <SSHDetailCard/>
-      <SSHDetailCard/>
-      <SSHDetailCard/>
+      <SSHDetailCard v-for="item in sshList" :data="item"/>
     </div>
   </div>
 </template>

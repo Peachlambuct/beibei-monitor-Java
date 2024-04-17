@@ -11,8 +11,8 @@ public class SubtaskSaveVO implements BaseData {
     Integer id;
     String name;
     String description;
-    @JsonFormat(timezone="GMT+8", pattern="yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(timezone="GMT+8", pattern="yyyy-MM-dd")
     Date startTime;
-    @JsonFormat(timezone="GMT+8", pattern="yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(timezone="GMT+8", pattern="yyyy-MM-dd")
     Date endTime;
 }

@@ -2,15 +2,14 @@ package com.example.controller;
 
 import com.example.entity.RestBean;
 import com.example.entity.dto.Account;
-import com.example.entity.vo.request.SshConnectionVO;
+import com.example.entity.vo.request.SshSaveVO;
+import com.example.entity.vo.response.SshConnectionVO;
 import com.example.entity.vo.request.SshTestVO;
 import com.example.entity.vo.response.SshListVO;
 import com.example.entity.vo.response.SshSettingsVO;
 import com.example.service.AccountService;
 import com.example.service.ClientSshService;
 import com.example.utils.Const;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.JSchException;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -43,11 +42,9 @@ public class SshController {
     }
 
     @PostMapping("/ssh-save")
-    public RestBean<Void> saveSshConnection(@RequestBody @Valid SshConnectionVO vo,
-                                            @RequestAttribute(Const.ATTR_USER_ID) Integer userId,
-                                            @RequestAttribute(Const.ATTR_USER_ROLE) String userRole) {
-        clientSshService.saveClientSshConnection(vo, userId);
-        return RestBean.success();
+    public RestBean<SshConnectionVO> saveSshConnection(@RequestBody @Valid SshSaveVO vo,
+                                            @RequestAttribute(Const.ATTR_USER_ID) Integer userId) {
+        return RestBean.success(clientSshService.saveClientSshConnection(vo, userId));
     }
 
     @GetMapping("/ssh")

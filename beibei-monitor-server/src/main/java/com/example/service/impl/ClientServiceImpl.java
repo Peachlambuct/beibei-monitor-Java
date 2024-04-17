@@ -1,5 +1,6 @@
 package com.example.service.impl;
 
+import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.entity.dto.*;
@@ -7,6 +8,7 @@ import com.example.entity.vo.request.*;
 import com.example.entity.vo.response.*;
 import com.example.mapper.*;
 import com.example.service.ClientService;
+import com.example.utils.Const;
 import com.example.utils.InfluxDbUtils;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
@@ -29,6 +31,9 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
 
     @Resource
     ClientDetailMapper detailMapper;
+
+    @Resource
+    AccountMapper accountMapper;
 
     @Resource
     InfluxDbUtils influx;
@@ -152,6 +157,20 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
         detailMapper.deleteById(clientId);
         this.initClientCache();
         currentRuntime.remove(clientId);
+    }
+
+    @Override
+    public List<ClientNameVO> getClientNameList(Integer userId, String role) {
+        List<ClientNameVO> clientNameVOS = baseMapper.getByClientName();
+        if (Const.ROLE_ADMIN.equals(role.substring(5))){
+            return clientNameVOS;
+        }else {
+            String clients = accountMapper.selectById(userId).getClients();
+            JSON.parseArray(clients, Integer.class).forEach(id -> {
+                clientNameVOS.removeIf(clientNameVO -> clientNameVO.getClientId().equals(id));
+            });
+        }
+        return clientNameVOS;
     }
 
     private boolean isOnline(RuntimeDetailVO runtime) {

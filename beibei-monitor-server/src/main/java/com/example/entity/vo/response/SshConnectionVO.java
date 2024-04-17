@@ -1,11 +1,13 @@
-package com.example.entity.vo.request;
+package com.example.entity.vo.response;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
 @Data
-public class SshTestVO {
+public class SshConnectionVO {
+    Integer id;
+    String name;
     @NotNull
     Integer port;
     @NotNull

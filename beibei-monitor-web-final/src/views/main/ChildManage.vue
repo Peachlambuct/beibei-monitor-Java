@@ -97,7 +97,7 @@ const initSubAccounts = () =>
 
 .account-card {
   border-radius: 5px;
-  background-color: #dde9eb;
+  background-color: #e7f0f1;
   padding: 10px;
   display: flex;
   align-items: center;

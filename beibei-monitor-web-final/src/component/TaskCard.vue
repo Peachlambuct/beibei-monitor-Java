@@ -5,7 +5,7 @@ import {ref} from "vue";
 import {get} from "@/net";
 import {ElMessage} from "element-plus";
 
-const emit = defineEmits(['deleteTask']);
+const emit = defineEmits(['deleteTask','updateTask']);
 const show = ref(false);
 
 defineProps({
@@ -18,15 +18,27 @@ function deleteTask(id) {
     emit('deleteTask')
   })
 }
+
+function formatDate(value) {
+  if (value) {
+    let date = new Date(value);
+    let options = { year: 'numeric', month: 'long', day: 'numeric' };
+    return date.toLocaleDateString('zh-CN', options);
+  }
+}
+
 </script>
 
 <template>
   <div class="card">
     <div style="display: flex;justify-content: space-between;margin-top: 10px">
       <div style="margin-left: 20px">
-        <div style="font-weight: bold;font-size: 20px">{{data.name}}开发任务</div>
+        <div style="font-weight: bold;font-size: 20px">{{data.name}}</div>
       </div>
       <div class="button-container">
+        <el-button style="float: right;margin-right: 10px" :icon="Delete" color="#5c5c5c"
+                   @click="$emit('updateTask',data)">修改
+        </el-button>
         <el-button style="float: right;margin-right: 10px" :icon="Delete" color="#5c5c5c"
                    @click="deleteTask(data.id)">删除
         </el-button>
@@ -36,36 +48,45 @@ function deleteTask(id) {
     <div>
       <div class="desc" style="margin-left: 20px" @click="show = true">
         <div>任务描述：{{data.description}}</div>
-        <div>任务负责人：{{data.principalName}}</div>
-        <div>任务开始时间：{{data.startTime}}</div>
-        <div>任务结束时间：{{data.endTime}}</div>
+        <div>任务小组成员：{{data.principalName}}</div>
+        <div>任务开始时间：{{formatDate(data.startTime)}}</div>
+        <div>任务结束时间：{{formatDate(data.endTime)}}</div>
         <div>任务状态：已完成</div>
         <div>任务相关服务器：Spark1</div>
         <div>任务进度：</div>
-        <el-progress :percentage="10" status=""/>
+        <el-progress :percentage="data.process" status=""/>
       </div>
     </div>
 
-    <el-dialog v-model="show" style="border-radius: 15px">
-      <div style="font-size: 23px;font-weight: bold">{{data.name}}</div>
-      <div style="font-size: 16px;font-weight: bold;margin-top: 10px">
-        <div>项目负责人：{{data.principalName}}</div>
-        <div>项目类型：{{data.type}}</div>
-        <div>项目描述：{{data.description}}</div>
-        <div>项目开始时间：{{data.startTime}}</div>
-        <div>项目结束时间：{{data.endTime}}</div>
-        <div>项目当前状态：<el-tag :type="data.status === 0 ? 'warning':'success'">{{data.status === 0 ? '未完成':'已完成'}}</el-tag></div>
-      </div>
-      <div v-if="data.subtasks.length > 0">
-        <div style="font-size: 18px;color: gray;margin-top: 10px">子任务列表</div>
-        <div style="font-size: 16px;font-weight: bold;margin-top: 10px" v-for="item in data.subtasks">
-          <div>项目负责人：{{item.principalName}}</div>
-          <div>项目描述：{{item.description}}</div>
-          <div>项目开始时间：{{item.startTime}}</div>
-          <div>项目结束时间：{{item.endTime}}</div>
-          <div>项目当前状态：<el-tag :type="item.status === 0 ? 'warning':'success'">{{item.status === 0 ? '未完成':'已完成'}}</el-tag></div>
+    <el-dialog v-model="show" style="border-radius: 15px;max-height: 600px" >
+      <el-scrollbar max-height="500">
+        <div style="font-size: 23px;font-weight: bold">{{data.name}}</div>
+        <div style="font-size: 16px;font-weight: bold;margin-top: 10px">
+          <div>任务小组成员：</div>
+          <ul v-for="item in data.principalNames">
+            <li>{{item}}</li>
+          </ul>
+          <div>任务所在服务器：</div>
+          <ul v-for="item in data.aboutClientNames">
+            <li>{{item}}</li>
+          </ul>
+          <div>项目类型：<el-tag>{{data.type}}</el-tag></div>
+          <div>项目描述：{{data.description}}</div>
+          <div>项目开始时间：{{formatDate(data.startTime)}}</div>
+          <div>项目结束时间：{{formatDate(data.endTime)}}</div>
+          <div>项目当前状态：<el-tag :type="data.status === 0 ? 'warning':'success'">{{data.status === 0 ? '未完成':'已完成'}}</el-tag></div>
         </div>
-      </div>
+        <el-divider style="margin: 20px 0"/>
+        <div v-if="data.subtasks.length > 0">
+          <div style="font-size: 18px;color: gray;margin-top: 10px">子任务列表</div>
+          <ul style="font-size: 14px;margin-top: 10px" v-for="item in data.subtasks">
+            <li>项目描述：{{item.description}}</li>
+            <li>项目开始时间：{{formatDate(item.startTime)}}</li>
+            <li>项目结束时间：{{formatDate(item.startTime)}}</li>
+            <li>项目当前状态：<el-tag :type="item.status === 0 ? 'warning':'success'">{{item.status === 0 ? '未完成':'已完成'}}</el-tag></li>
+          </ul>
+        </div>
+      </el-scrollbar>
     </el-dialog>
   </div>
 
@@ -78,13 +99,10 @@ function deleteTask(id) {
   width: 45%;
   border-radius: 10px;
   margin: 16px;
-
-
 }
 
 .button-container {
   display: flex;
-  flex-direction: column;
   align-items: flex-end;
   margin-right: 10px;
 }

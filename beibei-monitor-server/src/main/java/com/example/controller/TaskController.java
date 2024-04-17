@@ -39,7 +39,6 @@ public class TaskController {
 
     @PostMapping("/saveTask")
     public RestBean<Void> saveTask(@RequestBody TaskSaveVO task){
-        // 如果任务ID存在，更新任务。如果任务ID不存在，添加新任务
         if (task.getId() != null) {
             developService.updateTask(task);
         } else {

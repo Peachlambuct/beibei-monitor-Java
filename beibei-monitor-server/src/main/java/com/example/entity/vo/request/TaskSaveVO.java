@@ -17,9 +17,9 @@ public class TaskSaveVO {
     String type;
     String description;
     List<Integer> aboutClientId;
-    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd")
     Date startTime;
-    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd")
     Date endTime;
     List<SubtaskSaveVO> subtasks;
 }

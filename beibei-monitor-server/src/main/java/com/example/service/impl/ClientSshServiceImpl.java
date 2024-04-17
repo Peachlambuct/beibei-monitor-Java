@@ -1,12 +1,11 @@
 package com.example.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.example.entity.dto.Client;
 import com.example.entity.dto.ClientDetail;
 import com.example.entity.dto.ClientSsh;
 import com.example.entity.vo.request.RuntimeDetailVO;
-import com.example.entity.vo.request.SshConnectionVO;
+import com.example.entity.vo.request.SshSaveVO;
+import com.example.entity.vo.response.SshConnectionVO;
 import com.example.entity.vo.request.SshTestVO;
 import com.example.entity.vo.response.SshListVO;
 import com.example.entity.vo.response.SshSettingsVO;
@@ -15,15 +14,11 @@ import com.example.mapper.ClientSshMapper;
 import com.example.service.ClientSshService;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.jce.MD5;
 import jakarta.annotation.Resource;
 import org.springframework.beans.BeanUtils;
-import org.springframework.security.core.parameters.P;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -54,13 +49,16 @@ public class ClientSshServiceImpl extends ServiceImpl<ClientSshMapper, ClientSsh
 
 
     @Override
-    public void saveClientSshConnection(SshConnectionVO vo,Integer userId) {
+    public SshConnectionVO saveClientSshConnection(SshSaveVO vo, Integer userId) {
         // 获取客户端ip地址
-        String ip = detailMapper.selectById(vo.getClientId()).getIp();
-        ClientSsh clientSsh = this.getById(vo.getId());
-        vo.setPassword(DigestUtils.md5DigestAsHex(vo.getPassword().getBytes()));
+        ClientDetail detail = detailMapper.selectById(vo.getClientId());
+        if (detail == null)
+            return null;
+        String ip = detail.getIp();
+        ClientSsh clientSsh;
         // 判断是否已经存在连接
-        if (Objects.nonNull(vo.getId()) && Objects.nonNull(clientSsh)) {
+        if (Objects.nonNull(vo.getId())) {
+            clientSsh = new ClientSsh();
             BeanUtils.copyProperties(vo, clientSsh);
             clientSsh.setIp(ip);
             this.updateById(clientSsh);
@@ -71,6 +69,9 @@ public class ClientSshServiceImpl extends ServiceImpl<ClientSshMapper, ClientSsh
             clientSsh.setUserId(userId);
             this.save(clientSsh);
         }
+        SshConnectionVO sshConnectionVO = new SshConnectionVO();
+        BeanUtils.copyProperties(clientSsh,sshConnectionVO);
+        return sshConnectionVO;
     }
 
     //TODO 不知道干嘛用的
@@ -92,7 +93,7 @@ public class ClientSshServiceImpl extends ServiceImpl<ClientSshMapper, ClientSsh
     public String testConnection(SshTestVO sshTestVO) {
         ClientDetail clientDetail = detailMapper.selectById(sshTestVO.getClientId());
         if (clientDetail == null)
-            return "Client not found";
+            return "服务器并未在系统注册";
         sshTestVO.setIp(clientDetail.getIp());
         return testSsh(sshTestVO);
     }

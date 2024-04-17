@@ -27,14 +27,14 @@ import java.util.concurrent.Executors;
 
 @Slf4j
 @Component
-@ServerEndpoint("/terminal/{clientId}")
+@ServerEndpoint("/terminal/{id}")
 public class TerminalWebSocket {
 
-    private static ClientDetailMapper detailMapper;
+    private static ClientSshMapper clientSshMapper;
 
     @Resource
-    public void setDetailMapper(ClientDetailMapper detailMapper) {
-        TerminalWebSocket.detailMapper = detailMapper;
+    public void setDetailMapper(ClientSshMapper clientSshMapper) {
+        TerminalWebSocket.clientSshMapper = clientSshMapper;
     }
 
     private static ClientSshMapper sshMapper;
@@ -49,15 +49,14 @@ public class TerminalWebSocket {
 
     @OnOpen
     public void onOpen(Session session,
-                       @PathParam(value = "clientId") String clientId) throws Exception {
-        ClientDetail detail = detailMapper.selectById(clientId);
-        ClientSsh ssh = sshMapper.selectOne(new QueryWrapper<ClientSsh>().eq("client_id",clientId));
-        if (detail == null || ssh == null) {
+                       @PathParam(value = "id") String sshId) throws Exception {
+        ClientSsh clientSsh = clientSshMapper.selectById(sshId);
+        if (clientSsh == null) {
             session.close(new CloseReason(CloseReason.CloseCodes.CANNOT_ACCEPT, "无法识别此主机"));
             return;
         }
-        if (this.createSshConnection(session, ssh, detail.getIp())) {
-            log.info("主机 {} 的SSH连接已创建", detail.getIp());
+        if (this.createSshConnection(session, clientSsh, clientSsh.getIp())) {
+            log.info("主机 {} 的SSH连接已创建", clientSsh.getIp());
         }
     }
 

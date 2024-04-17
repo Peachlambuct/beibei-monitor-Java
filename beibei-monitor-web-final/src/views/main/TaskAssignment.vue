@@ -2,7 +2,7 @@
 
 import {Plus} from "@element-plus/icons-vue";
 import TaskCard from "@/component/TaskCard.vue";
-import {reactive, ref} from "vue";
+import {reactive, ref, watch} from "vue";
 import {get, post} from "@/net";
 import {ElMessage} from "element-plus";
 import {osNameToIcon} from "@/tools";
@@ -14,7 +14,7 @@ let mainTask = ref({
   name: '',
   type: '',
   description: '',
-  principalName: '',
+  principalIds: [],
   startTime: '',
   endTime: '',
   aboutClientId: [],
@@ -23,14 +23,20 @@ let mainTask = ref({
 const store = useStore();
 const taskList = ref([])
 const simpleList = ref([])
-const onCheck = (state, id) => {
-  if(state) {
-    mainTask.value.aboutClientId.push(id)
-  } else {
-    const index = mainTask.value.aboutClientId.indexOf(id);
-    mainTask.value.aboutClientId.splice(index, 1)
-  }
-}
+const accounts = ref([])
+const isChecked = (id, list) => {
+  list = list || [];
+  const checked = ref(list.includes(id));
+  watch(checked, (newVal) => {
+    const index = list.indexOf(id);
+    if (newVal && index === -1) {
+      list.push(id);
+    } else if (!newVal && index !== -1) {
+      list.splice(index, 1);
+    }
+  });
+  return checked;
+};
 if(store.isAdmin) {
   get('/api/monitor/simple-list', list => {
     simpleList.value = list
@@ -39,23 +45,34 @@ if(store.isAdmin) {
 function getTaskList() {
   get("/api/task/list", (res) => {
     taskList.value = res
+    console.info("服务器获取" + res)
   })
 }
 getTaskList()
+get('/api/user/sub/list', list => accounts.value = list)
 function addSubTask() {
   mainTask.value.subtasks.push({
     name: '',
     description: '',
-    principalName: '',
     startTime: '',
     endTime: '',
   });
 }
 
 function addTask() {
-  post("/api/task/addTask", mainTask.value, (res) => {
-    ElMessage.success("添加成功")
+  post("/api/task/saveTask", mainTask.value, (res) => {
+    ElMessage.success("添加/修改成功")
     getTaskList()
+    mainTask.value = {
+      name: '',
+      type: '',
+      description: '',
+      principalIds: [],
+      startTime: '',
+      endTime: '',
+      aboutClientId: [],
+      subtasks: []
+    }
   })
   console.log(mainTask.value)
   show.value = false
@@ -63,6 +80,14 @@ function addTask() {
 
 function removeSubTask(index) {
   mainTask.value.subtasks.splice(index, 1)
+}
+
+function updateTask(data) {
+  mainTask.value = data
+  mainTask.value.aboutClientId = data.aboutClientIds
+  console.info("data：" + data)
+  console.info(mainTask.value)
+  show.value = true
 }
 
 </script>
@@ -92,22 +117,36 @@ function removeSubTask(index) {
           <el-input v-model="mainTask.name" placeholder="请输入任务名称" style="margin-bottom: 10px"/>
           <el-input v-model="mainTask.type" placeholder="请输入任务类型" style="margin-bottom: 10px"/>
           <el-input v-model="mainTask.description" placeholder="请输入任务描述" style="margin-bottom: 10px"/>
-          <el-input v-model="mainTask.principalName" placeholder="请输入任务负责人" style="margin-bottom: 10px"/>
           <el-date-picker
               v-model="mainTask.startTime"
               type="date"
-              placeholder="选择日期"
+              placeholder="任务开始日期"
               style="margin-bottom: 10px"
           ></el-date-picker>
           <el-date-picker
               v-model="mainTask.endTime"
               type="date"
-              placeholder="选择日期"
+              placeholder="任务结束日期"
               style="margin-bottom: 10px;margin-left: 10px"
           ></el-date-picker>
+          <div style="font-weight: bold">项目小组成员</div>
+          <el-scrollbar max-height="200">
+            <div class="client-card" v-for="item in accounts">
+              <el-checkbox v-model="isChecked(item.id, mainTask.principalIds).value"/>
+              <div style="margin-left: 20px">
+                <div style="font-size: 14px;font-weight: bold">
+                  <span>{{ item.username }}</span>
+                </div>
+                <div style="font-size: 12px;color: grey">
+                  <span style="margin-right: 10px">邮箱: {{item.email}}</span>
+                </div>
+              </div>
+            </div>
+          </el-scrollbar>
+          <div style="font-weight: bold">项目所在服务器</div>
           <el-scrollbar max-height="200">
             <div class="client-card" v-for="item in simpleList">
-              <el-checkbox @change="state => onCheck(state, item.id)"/>
+              <el-checkbox v-model="isChecked(item.id, mainTask.aboutClientId).value"/>
               <div style="margin-left: 20px">
                 <div style="font-size: 14px;font-weight: bold">
                   <span :class="`flag-icon flag-icon-${item.location}`"></span>
@@ -131,7 +170,6 @@ function removeSubTask(index) {
           <div v-for="(subTask, index) in mainTask.subtasks" :key="index" style="margin-top: 40px">
             <el-input v-model="subTask.name" placeholder="请输入任务名称" style="margin-bottom: 10px"/>
             <el-input v-model="subTask.description" placeholder="请输入任务描述" style="margin-bottom: 10px"/>
-            <el-input v-model="subTask.principalName" placeholder="请输入任务负责人" style="margin-bottom: 10px"/>
             <el-date-picker
                 v-model="subTask.startTime"
                 type="date"
@@ -156,7 +194,7 @@ function removeSubTask(index) {
     </el-dialog>
 
     <div style="display: flex; flex-direction: row; flex-wrap: wrap;">
-      <TaskCard @delete-task="getTaskList" v-for="item in taskList" :data="item"/>
+      <TaskCard @update-task="updateTask" @delete-task="getTaskList" v-for="item in taskList" :data="item"/>
     </div>
   </div>
 </template>
