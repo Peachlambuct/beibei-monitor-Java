@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.example.entity.dto.DevelopTask;
 import com.example.entity.vo.request.SubtaskStatusVO;
 import com.example.entity.vo.request.TaskSaveVO;
+import com.example.entity.vo.response.SimpleTaskVO;
 import com.example.entity.vo.response.SubtaskVO;
 import com.example.entity.vo.response.TaskListVO;
 
@@ -25,4 +26,6 @@ public interface DevelopService extends IService<DevelopTask> {
     List<SubtaskVO> getAllSubtask(Integer userId, String role);
 
     void deleteExpiredTasks();
+
+    List<SimpleTaskVO> getTaskByClientId(Integer clientId);
 }

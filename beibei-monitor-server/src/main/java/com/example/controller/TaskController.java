@@ -4,10 +4,12 @@ package com.example.controller;
 import com.example.entity.RestBean;
 import com.example.entity.vo.request.SubtaskStatusVO;
 import com.example.entity.vo.request.TaskSaveVO;
+import com.example.entity.vo.response.SimpleTaskVO;
 import com.example.entity.vo.response.SubtaskVO;
 import com.example.entity.vo.response.TaskListVO;
 import com.example.service.DevelopService;
 import com.example.utils.Const;
+import com.influxdb.client.service.TasksService;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
 
@@ -59,5 +61,10 @@ public class TaskController {
     public RestBean<List<SubtaskVO>> getAllSubtask(@RequestAttribute(Const.ATTR_USER_ID) Integer userId,
                                                    @RequestAttribute(Const.ATTR_USER_ROLE) String role){
         return RestBean.success(developService.getAllSubtask(userId,role));
+    }
+
+    @GetMapping("/getSimpleTask")
+    public RestBean<List<SimpleTaskVO>> getTaskByClientId(@RequestParam("clientId") Integer clientId){
+        return  RestBean.success(developService.getTaskByClientId(clientId));
     }
 }

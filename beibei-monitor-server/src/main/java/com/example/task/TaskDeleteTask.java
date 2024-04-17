@@ -20,8 +20,7 @@ public class TaskDeleteTask {
     /**
      * 每天凌晨执行删除过期警告日志的任务
      */
-//    @Scheduled(cron = "0 0 0 * * ?")  // 每天凌晨执行
-    @Scheduled(cron = "0/30 * * * * ?")  // 每天凌晨执行
+    @Scheduled(cron = "0 0 0 * * ?")  // 每天凌晨执行
     public void deleteExpiredTasks() {
         log.info("执行删除任务已结束30天的任务");
         developService.deleteExpiredTasks();

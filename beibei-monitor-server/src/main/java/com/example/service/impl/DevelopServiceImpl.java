@@ -9,6 +9,7 @@ import com.example.entity.dto.Client;
 import com.example.entity.dto.DevelopSubtask;
 import com.example.entity.dto.DevelopTask;
 import com.example.entity.vo.request.*;
+import com.example.entity.vo.response.SimpleTaskVO;
 import com.example.entity.vo.response.SubtaskVO;
 import com.example.entity.vo.response.TaskListVO;
 import com.example.mapper.AccountMapper;
@@ -18,7 +19,6 @@ import com.example.mapper.DevelopTaskMapper;
 import com.example.service.DevelopService;
 import com.example.utils.Const;
 import jakarta.annotation.Resource;
-import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class DevelopServiceImpl extends ServiceImpl<DevelopTaskMapper, DevelopTask> implements DevelopService {
@@ -171,7 +170,14 @@ public class DevelopServiceImpl extends ServiceImpl<DevelopTaskMapper, DevelopTa
     @Transactional
     public void deleteExpiredTasks() {
         List<Integer> ids = developTaskMapper.getExpiredTaskIds();
-        developTaskMapper.deleteBatchIds(ids);
-        subtaskMapper.delete(new QueryWrapper<DevelopSubtask>().in("task_id",ids));
+        if (!ids.isEmpty()){
+            developTaskMapper.deleteBatchIds(ids);
+            subtaskMapper.delete(new QueryWrapper<DevelopSubtask>().in("task_id",ids));
+        }
+    }
+
+    @Override
+    public List<SimpleTaskVO> getTaskByClientId(Integer clientId) {
+        return developTaskMapper.selectTasksByClientId(String.valueOf(clientId));
     }
 }
