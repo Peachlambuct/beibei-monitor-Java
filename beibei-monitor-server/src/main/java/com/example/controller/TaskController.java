@@ -2,8 +2,8 @@ package com.example.controller;
 
 
 import com.example.entity.RestBean;
-import com.example.entity.vo.request.TaskAddVO;
-import com.example.entity.vo.request.TaskUpdateVO;
+import com.example.entity.vo.request.SubtaskStatusVO;
+import com.example.entity.vo.request.TaskSaveVO;
 import com.example.entity.vo.response.TaskListVO;
 import com.example.service.DevelopService;
 import com.example.utils.Const;
@@ -25,11 +25,6 @@ public class TaskController {
                                            @RequestAttribute(Const.ATTR_USER_ROLE) String role){
         return RestBean.success(developService.getMainTask(userId,role));
     }
-    @PostMapping("/addTask")
-    public RestBean<Void> addTask(@RequestBody TaskAddVO task){
-        developService.addTask(task);
-        return RestBean.success();
-    }
     @GetMapping("/deleteTask")
     public RestBean<Void> deleteTask(@RequestParam Integer taskId){
         developService.deleteTask(taskId);
@@ -42,9 +37,21 @@ public class TaskController {
         return RestBean.success();
     }
 
-    @PostMapping("/updateTask")
-    public RestBean<Void> updateTask(@RequestBody TaskUpdateVO task){
-        developService.updateTask(task);
+    @PostMapping("/saveTask")
+    public RestBean<Void> saveTask(@RequestBody TaskSaveVO task){
+        // 如果任务ID存在，更新任务。如果任务ID不存在，添加新任务
+        if (task.getId() != null) {
+            developService.updateTask(task);
+        } else {
+            developService.addTask(task);
+        }
+        return RestBean.success();
+    }
+
+    @PostMapping("updateSubtask")
+    public RestBean<Void> updateSubtask(@RequestAttribute(Const.ATTR_USER_ID) Integer userId,
+                                        @RequestBody SubtaskStatusVO subtaskStatusVO){
+        developService.updateSubtaskStatus(subtaskStatusVO,userId);
         return RestBean.success();
     }
 }

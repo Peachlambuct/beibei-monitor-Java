@@ -3,13 +3,12 @@ package com.example.entity.vo.request;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-import org.apache.ibatis.javassist.runtime.Inner;
 
 import java.util.Date;
 import java.util.List;
 
 @Data
-public class TaskUpdateVO {
+public class TaskSaveVO {
     @NotNull
     Integer id;
     @NotNull
@@ -22,5 +21,5 @@ public class TaskUpdateVO {
     Date startTime;
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     Date endTime;
-    List<SubtaskUpdateVO> subtasks;
+    List<SubtaskSaveVO> subtasks;
 }

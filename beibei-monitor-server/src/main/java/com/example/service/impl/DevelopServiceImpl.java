@@ -2,6 +2,7 @@ package com.example.service.impl;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.entity.dto.Account;
 import com.example.entity.dto.Client;
@@ -21,8 +22,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class DevelopServiceImpl extends ServiceImpl<DevelopTaskMapper, DevelopTask> implements DevelopService {
@@ -41,13 +42,13 @@ public class DevelopServiceImpl extends ServiceImpl<DevelopTaskMapper, DevelopTa
 
     @Override
     @Transactional
-    public void addTask(TaskAddVO task) {
+    public void addTask(TaskSaveVO task) {
         DevelopTask developTask = new DevelopTask(null, task.getName(), JSONArray.copyOf(task.getPrincipalIds()).toJSONString(), task.getType(),
                 task.getDescription(), JSONArray.copyOf(task.getAboutClientId()).toJSONString(), task.getStartTime(), task.getEndTime(), null);
-        List<SubtaskAddVO> subtasks = task.getSubtasks();
+        List<SubtaskSaveVO> subtasks = task.getSubtasks();
         this.save(developTask);
 
-        for (SubtaskAddVO subtask : subtasks) {
+        for (SubtaskSaveVO subtask : subtasks) {
             DevelopSubtask developSubtask = new DevelopSubtask();
             BeanUtils.copyProperties(subtask, developSubtask);
             developSubtask.setTaskId(developTask.getId());
@@ -111,14 +112,16 @@ public class DevelopServiceImpl extends ServiceImpl<DevelopTaskMapper, DevelopTa
     }
 
     @Override
-    public void updateTask(TaskUpdateVO task) {
-        DevelopTask developTask = new DevelopTask(null, task.getName(), JSONArray.copyOf(task.getPrincipalIds()).toJSONString(), task.getType(),
+    @Transactional
+    public void updateTask(TaskSaveVO task) {
+        DevelopTask developTask = new DevelopTask(task.getId(), task.getName(), JSONArray.copyOf(task.getPrincipalIds()).toJSONString(), task.getType(),
                 task.getDescription(), JSONArray.copyOf(task.getAboutClientId()).toJSONString(), task.getStartTime(), task.getEndTime(), null);
         this.updateById(developTask);
         task.getSubtasks().forEach(subtask -> {
             DevelopSubtask developSubtask = new DevelopSubtask();
             BeanUtils.copyProperties(subtask, developSubtask);
-            subtaskMapper.update(developSubtask, new QueryWrapper<DevelopSubtask>().eq("id", subtask.getId()));
+            developSubtask.setTaskId(task.getId());
+            subtaskMapper.update(developSubtask, new QueryWrapper<DevelopSubtask>().eq("id", developSubtask.getId()));
         });
     }
 
@@ -128,8 +131,17 @@ public class DevelopServiceImpl extends ServiceImpl<DevelopTaskMapper, DevelopTa
     }
 
     @Override
-    public void updateSubtaskStatus(SubtaskStatusVO subtaskStatusVO) {
-        subtaskMapper.updateStatus(subtaskStatusVO);
+    @Transactional
+    public void updateSubtaskStatus(SubtaskStatusVO subtaskStatusVO,Integer userId) {
+        // 创建一个UpdateWrapper实例
+        UpdateWrapper<DevelopSubtask> updateWrapper = new UpdateWrapper<>();
+        // 设置要更新的字段
+        updateWrapper.set("status", subtaskStatusVO.getStatus());
+        updateWrapper.set("update_time", new Date());
+        updateWrapper.set("update_user_id", userId);
+        // 设置更新条件
+        updateWrapper.eq("id", subtaskStatusVO.getSubtaskId());
+        // 使用Mapper接口的update方法来更新数据
+        subtaskMapper.update(null, updateWrapper);
     }
-
 }
