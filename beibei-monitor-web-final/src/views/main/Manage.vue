@@ -56,12 +56,14 @@ const register = reactive({
 })
 const refreshToken = () => get('/api/monitor/register', token => register.token = token)
 
-function openTerminal(id) {
+function openTerminal(data) {
   terminal.show = true
-  terminal.id = id
+  terminal.id = data.id
+  terminal.data = data
   detail.show = false
 }
 const terminal = reactive({
+  data: {},
   show: false,
   id: -1
 })
@@ -114,30 +116,12 @@ const terminal = reactive({
           </div>
         </div>
       </template>
-      <terminal-window :id="terminal.id"/>
+      <terminal-window :id="terminal.id" :data="terminal.data"/>
     </el-drawer>
   </div>
 </template>
 
 <style scoped>
-:deep(.el-drawer__header) {
-  margin-bottom: 10px;
-}
-
-:deep(.el-checkbox-group .el-checkbox) {
-  margin-right: 10px;
-}
-
-:deep(.el-drawer) {
-  margin: 10px;
-  height: calc(100% - 20px);
-  border-radius: 10px;
-}
-
-:deep(.el-drawer__body) {
-  padding: 0;
-}
-
 .manage-main {
   margin: 0 50px;
 

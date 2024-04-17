@@ -5,14 +5,8 @@ import {ElMessage} from "element-plus";
 import Terminal from "@/component/Terminal.vue";
 
 const props = defineProps({
-  id: Number
-})
-
-const connection = reactive({
-  ip: '',
-  port: 22,
-  username: '',
-  password: ''
+  id: Number,
+  data: Object
 })
 
 const rules = {
@@ -29,49 +23,30 @@ const rules = {
 
 const state = ref(1)
 const formRef = ref()
-
-function saveConnection() {
-  formRef.value.validate((isValid) => {
-    if(isValid) {
-      post('/api/monitor/ssh-save', {
-        ...connection,
-        id: props.id
-      }, () => state.value = 2)
-    }
-  })
-}
-
-watch(() => props.id, id => {
-  state.value = 1
-  if(id !== -1) {
-    connection.ip = ''
-    get(`/api/monitor/ssh?clientId=${id}`, data => Object.assign(connection, data))
-  }
-}, { immediate: true })
 </script>
 
 <template>
   <div class="terminal-main">
-    <div class="login" v-loading="!connection.ip" v-if="state === 1">
+    <div class="login" v-loading="!data.ip" v-if="state === 1">
       <i style="font-size: 50px" class="fa-solid fa-terminal"></i>
       <div style="margin-top: 10px;font-weight: bold;font-size: 20px">服务端连接信息</div>
-      <el-form style="width: 400px;margin: 20px auto" :model="connection"
+      <el-form style="width: 400px;margin: 20px auto" :model="data"
                :rules="rules" ref="formRef" label-width="100">
         <div style="display: flex;gap: 10px">
           <el-form-item style="width: 100%" label="服务器IP地址" prop="ip">
-            <el-input v-model="connection.ip" disabled/>
+            <el-input v-model="data.ip" disabled/>
           </el-form-item>
           <el-form-item style="width: 80px" prop="port" label-width="0">
-            <el-input placeholder="端口" v-model="connection.port"/>
+            <el-input placeholder="端口" v-model="data.port"/>
           </el-form-item>
         </div>
         <el-form-item prop="username" label="登录用户名">
-          <el-input placeholder="请输入用户名..." v-model="connection.username"/>
+          <el-input placeholder="请输入用户名..." v-model="data.username"/>
         </el-form-item>
         <el-form-item prop="password" label="登录密码">
-          <el-input placeholder="请输入密码..." type="password" v-model="connection.password"/>
+          <el-input placeholder="请输入密码..." type="password" v-model="data.password"/>
         </el-form-item>
-        <el-button type="success" @click="saveConnection" plain>立即连接</el-button>
+        <el-button type="success" @click="state = 2" plain>立即连接</el-button>
       </el-form>
     </div>
     <div v-if="state === 2">

@@ -1,5 +1,5 @@
 <script setup>
-import {computed, reactive, watch} from "vue";
+import {computed, reactive, ref, watch} from "vue";
 import {get, post} from "@/net";
 import {copyIp, cpuNameToImage, fitByUnit, osNameToIcon, percentageToStatus, rename} from "@/tools";
 import {ElMessage, ElMessageBox} from "element-plus";
@@ -49,7 +49,11 @@ const submitNodeEdit = () => {
     ElMessage.success('节点信息已更新')
   })
 }
-
+const sshList = ref([])
+function getSSHList() {
+  get(`/api/ssh/getSshByClient?clientId=${props.id}`, data => sshList.value = data)
+}
+getSSHList()
 function deleteClient() {
   ElMessageBox.confirm('删除此主机后所有统计数据都将丢失，您确定要这样做吗？', '删除主机', {
     confirmButtonText: '确定',
@@ -80,13 +84,15 @@ setInterval(() => {
 }, 10000)
 
 const now = computed(() => details.runtime.list[details.runtime.list.length - 1])
-
+const task = ref()
 const init = id => {
   if(id !== -1) {
     details.base = {}
     details.runtime = { list: [] }
     get(`/api/monitor/details?clientId=${id}`, data => Object.assign(details.base, data))
     get(`/api/monitor/runtime-history?clientId=${id}`, data => Object.assign(details.runtime, data))
+    get(`/api/ssh/getSshByClient?clientId=${id}`, data => sshList.value = data)
+    get(`/api/task/getSimpleTask?clientId=${id}`, data => task.value = data)
   }
 }
 watch(() => props.id, init, { immediate: true })
@@ -102,8 +108,6 @@ watch(() => props.id, init, { immediate: true })
             服务器信息
           </div>
           <div>
-            <el-button :icon="Connection" type="info"
-                       @click="emits('terminal', id)" plain text>SSH远程连接</el-button>
             <el-button :icon="Delete" type="danger" style="margin-left: 0"
                        @click="deleteClient" plain text>删除此主机</el-button>
           </div>
@@ -230,18 +234,50 @@ watch(() => props.id, init, { immediate: true })
         </div>
         <el-empty description="服务器处于离线状态，请检查服务器是否正常运行" v-else/>
 
+
+        <div v-if="sshList.length">
+          <div class="title" style="margin-top: 20px">
+            <i class="fa-solid fa-gauge-high"></i>
+            可用SSH连接
+          </div>
+
+          <el-divider style="margin: 10px 0"/>
+          <div>
+            <el-scrollbar max-height="200">
+              <div v-for="item in sshList" :key="item.id">
+                <div class="ssh-card" @click="$emit('terminal',item)">
+                  <div style="font-size: 20px;font-weight: bold">{{item.name}}</div>
+                  <div>
+                    <span style="color: gray">IP地址：</span>
+                    <span>{{item.ip}}</span>
+                  </div>
+                  <div>
+                    <span style="color: gray">端口：</span>
+                    <span>{{item.port}}</span>
+                  </div>
+                </div>
+              </div>
+            </el-scrollbar>
+          </div>
+        </div>
+
         <div class="title" style="margin-top: 20px">
           <i class="fa-solid fa-gauge-high"></i>
           项目信息
         </div>
         <el-divider style="margin: 10px 0"/>
         <div>
-          <ul>
-            <li>XXX项目--负责人:XXX--项目状态：开发中</li>
-            <li>XXX项目--负责人:XXX--项目状态：开发中</li>
-            <li>XXX项目--负责人:XXX--项目状态：运行中</li>
-            <li>XXX项目--负责人:XXX--项目状态：开发中</li>
-          </ul>
+          <el-scrollbar max-height="200">
+            <div v-for="item in task">
+              <div class="task-card">
+                <div style="font-size: 20px;font-weight: bold">{{item.name}}</div>
+                <div>
+                  <span style="color: gray">开发进度：</span>
+                  <span>{{item.status === 0 ? '开发中': '已完成'}}</span>
+                </div>
+              </div>
+            </div>
+          </el-scrollbar>
         </div>
       </div>
     </div>
@@ -287,6 +323,49 @@ watch(() => props.id, init, { immediate: true })
         font-weight: bold;
       }
     }
+  }
+}
+.ssh-card {
+  background-image: linear-gradient(to right, rgba(212, 234, 247, 0.6), #d6d6d6);
+  height: 70px;
+  width: 80%;
+  border-radius: 10px;
+  margin: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 20px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #606060;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  transition: .3s;
+  &:hover {
+    cursor: pointer;
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+  }
+}
+
+.task-card {
+  background-image: linear-gradient(to right, #f3f3f3, #f8f8f8);
+  height: 50px;
+  width: 80%;
+  border-radius: 10px;
+  margin: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 20px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #606060;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  transition: .3s;
+  &:hover {
+    cursor: pointer;
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
   }
 }
 </style>

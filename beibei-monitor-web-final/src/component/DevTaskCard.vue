@@ -1,13 +1,18 @@
 <script setup>
 
 import {Delete} from "@element-plus/icons-vue";
+import {percentageToStatus} from "@/tools";
+
+defineProps({
+  data: Object
+})
 </script>
 
 <template>
   <div class="card">
     <div style="display: flex;justify-content: space-between;margin-top: 10px">
       <div style="margin-left: 20px">
-        <div style="font-weight: bold;font-size: 20px">XXXX开发任务</div>
+        <div style="font-weight: bold;font-size: 20px">{{data.name}}</div>
       </div>
       <div class="button-container">
         <el-button style="float: right;margin-right: 10px" :icon="Delete" color="#5c5c5c"
@@ -18,14 +23,15 @@ import {Delete} from "@element-plus/icons-vue";
     <el-divider style="margin: 10px 0"/>
     <div>
       <div class="desc" style="margin-left: 20px">
-        <div>任务描述：XXXXXXXXXXXXXXX</div>
-        <div>任务负责人：XXXX</div>
-        <div>任务开始时间：XXXX</div>
-        <div>任务结束时间：XXXX</div>
+        <div>任务描述：{{data.description}}</div>
+        <div>任务小组成员：{{data.principalNames}}</div>
+        <div>任务开始时间：{{ data.startTime }}</div>
+        <div>任务结束时间：{{ data.endTime }}</div>
         <div>任务状态：未完成</div>
-        <div>任务相关服务器：Spark1</div>
+        <div>任务相关服务器：{{data.aboutClientNames}}</div>
         <div>任务进度：</div>
-        <el-progress :percentage="100" status="success" />
+        <el-progress :percentage="data.process * 100" status=""/>
+        <p>{{data}}</p>
       </div>
     </div>
   </div>

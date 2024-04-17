@@ -1,20 +1,43 @@
 <script setup>
-import {ref} from "vue";
+import {ref, watch} from "vue";
+import {get} from "@/net";
 
-const locations = [
-  {name: 'dev', desc: '开发'},
-  {name: 'wh', desc: '维护'},
-  {name: 'cs', desc: '测试'},
-  {name: 'sj', desc: '设计'},
-  {name: 'wx', desc: '维修'},
-]
-
-const time = [
-  "2018/4/12","2018/4/11","2018/4/10","2018/3/9","2018/2/8"
-]
-const checkedNodes = ref([])
-
+const taskList = ref([])
 const show = ref(false)
+const checkedNodes = ref([])
+const selectedTasks = ref([])
+let taskTypes = []
+
+function getPage() {
+  get('/api/task/getAllSubtask', data => {
+    taskList.value = data.map(task => {
+      const date = new Date(task.startTime);
+      task.startTime = date.toLocaleDateString('en-CA');
+      task.endTime = date.toLocaleDateString('en-CA');
+      return task;
+    });
+    taskList.value.sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
+    taskTypes = Array.from(new Set(taskList.value.map(task => task.taskType)));
+    checkedNodes.value = taskTypes;
+    selectedTasks.value = taskList.value;  // 初始时显示所有任务
+    console.info(checkedNodes.value)
+  })
+}
+getPage()
+
+watch(checkedNodes, (newVal) => {
+  if (newVal.length === taskTypes.length) {
+    selectedTasks.value = taskList.value;  // 如果所有复选框都被选中，显示所有任务
+  } else {
+    selectedTasks.value = taskList.value.filter(task => newVal.includes(task.taskType));  // 否则，只显示选中的任务类型的任务
+  }
+});
+
+const item = ref()
+function initItem(data) {
+  item.value = data
+  show.value = true
+}
 </script>
 
 <template>
@@ -29,26 +52,54 @@ const show = ref(false)
 
     <div style="margin-bottom: 20px">
       <el-checkbox-group v-model="checkedNodes">
-        <el-checkbox v-for="node in locations" :key="node" :label="node.name" border>
-          <span style="font-size: 13px;margin-left: 10px">{{node.desc}}</span>
+        <el-checkbox v-for="node in taskTypes" :key="node" :label="node" border>
+          <span style="font-size: 13px;margin-left: 10px">{{node}}</span>
         </el-checkbox>
       </el-checkbox-group>
     </div>
 
     <el-timeline style="max-width: 100%">
-      <el-timeline-item style="width: 70%" v-for="item in time" :key="item" :timestamp="item" placement="top">
-        <el-card class="taskCard" @click="show = true">
-          <span style="display: flex; align-items: center; width: 40%">
-            <h4>Update Github template</h4>
-            <el-tag style="margin-left: 40px">开发</el-tag>
+      <el-timeline-item style="width: 70%" v-for="item in selectedTasks" :key="item" :timestamp="item.startTime" placement="top">
+        <el-card class="taskCard" @click="initItem(item)">
+          <span style="display: flex; align-items: center;">
+            <h2>{{item.name}}</h2>
+            <el-tag style="margin-left: 40px">{{ item.taskType }}</el-tag>
           </span>
-          <p>Tom committed {{item}} 20:46</p>
+          <p>任务描述：{{item.description}}</p>
+          <p>开发周期：{{item.startTime}} 至 {{item.endTime}}</p>
+          <p>项目进度：{{item.status === 0 ? '进行中...': '已完成'}}</p>
         </el-card>
       </el-timeline-item>
     </el-timeline>
 
-    <el-dialog v-model="show">
-
+    <el-dialog v-model="show" title="任务详情" style="border-radius: 10px">
+      <el-form label-position="left" label-width="120px">
+        <el-form-item label="任务名称:">
+          {{ item.name }}
+        </el-form-item>
+        <el-form-item label="任务描述:">
+          {{ item.description }}
+        </el-form-item>
+        <el-form-item label="任务类型:">
+          {{ item.taskType }}
+        </el-form-item>
+        <el-form-item label="开始时间:">
+          {{ item.startTime }}
+        </el-form-item>
+        <el-form-item label="结束时间:">
+          {{ item.endTime }}
+        </el-form-item>
+        <el-form-item label="更新时间:">
+          {{ item.updateTime ? item.updateTime : '无' }}
+        </el-form-item>
+        <el-form-item label="更新用户ID:">
+          {{ item.updateUserId ? item.updateUserId : '无' }}
+        </el-form-item>
+        <el-form-item label="状态:">
+          <el-tag type="warning" v-if="item.status === 0">进行中...</el-tag>
+          <el-tag type="success" v-else>已完成</el-tag>
+        </el-form-item>
+      </el-form>
     </el-dialog>
   </div>
 </template>
@@ -56,5 +107,12 @@ const show = ref(false)
 <style scoped>
 .taskCard {
   background-image: linear-gradient(to right, rgba(212, 234, 247, 0.6), #d6d6d6);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  transition: .3s;
+  &:hover {
+    cursor: pointer;
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+  }
 }
 </style>

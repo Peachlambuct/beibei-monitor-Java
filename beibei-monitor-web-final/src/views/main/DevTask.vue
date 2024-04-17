@@ -1,6 +1,23 @@
 <script setup>
 
 import DevTaskCard from "@/component/DevTaskCard.vue";
+import {ref} from "vue";
+import {get} from "@/net";
+
+const taskList = ref([])
+function getList() {
+  get('/api/task/list', data => {
+    taskList.value = data.map(task => {
+      const startDate = new Date(task.startTime);
+      const endDate = new Date(task.endTime);
+      task.startTime = startDate.toLocaleDateString('en-CA');
+      task.endTime = endDate.toLocaleDateString('en-CA');
+      return task;
+    });
+  })
+}
+
+getList()
 </script>
 
 <template>
@@ -19,11 +36,7 @@ import DevTaskCard from "@/component/DevTaskCard.vue";
       <el-divider style="margin: 10px 0"/>
 
       <div style="display: flex; flex-direction: row; flex-wrap: wrap;">
-        <DevTaskCard/>
-        <DevTaskCard/>
-        <DevTaskCard/>
-        <DevTaskCard/>
-        <DevTaskCard/>
+        <DevTaskCard v-for="item in taskList" :data="item"/>
       </div>
     </div>
   </div>

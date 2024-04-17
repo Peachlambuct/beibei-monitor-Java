@@ -19,6 +19,7 @@ import com.example.mapper.DevelopTaskMapper;
 import com.example.service.DevelopService;
 import com.example.utils.Const;
 import jakarta.annotation.Resource;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class DevelopServiceImpl extends ServiceImpl<DevelopTaskMapper, DevelopTask> implements DevelopService {
@@ -156,11 +158,10 @@ public class DevelopServiceImpl extends ServiceImpl<DevelopTaskMapper, DevelopTa
             // 删除不在当前用户下的任务
             clients.forEach(clientId ->{
                 subtaskVOS.removeIf(subtaskVO ->
-                        JSONArray.parseArray(subtaskVO.getAboutClientId(),Integer.class)
-                        .stream()
-                        .filter(clients::contains)
-                        .toList()
-                        .size() < 1);
+                        JSONArray.parseArray(subtaskVO.getAboutClientId(), Integer.class)
+                                .stream()
+                                .filter(clients::contains)
+                                .toList().isEmpty());
             });
         }
         return subtaskVOS;

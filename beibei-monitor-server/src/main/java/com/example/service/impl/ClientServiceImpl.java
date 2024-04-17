@@ -162,13 +162,10 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
     @Override
     public List<ClientNameVO> getClientNameList(Integer userId, String role) {
         List<ClientNameVO> clientNameVOS = baseMapper.getByClientName();
-        if (Const.ROLE_ADMIN.equals(role.substring(5))){
-            return clientNameVOS;
-        }else {
+        if (!Const.ROLE_ADMIN.equals(role.substring(5))){
             String clients = accountMapper.selectById(userId).getClients();
-            JSON.parseArray(clients, Integer.class).forEach(id -> {
-                clientNameVOS.removeIf(clientNameVO -> clientNameVO.getClientId().equals(id));
-            });
+            clientNameVOS = clientNameVOS.stream().filter(vo
+                    -> JSON.parseArray(clients, Integer.class).contains(vo.getClientId())).toList();
         }
         return clientNameVOS;
     }
