@@ -13,4 +13,7 @@ public interface DevelopTaskMapper extends BaseMapper<DevelopTask> {
             "FROM db_develop_task " +
             "WHERE JSON_CONTAINS(principal_ids, CAST(#{userId} AS JSON));")
     List<DevelopTask> getAllByUserId(Integer userId);
+
+    @Select("select id from db_develop_task where end_time < DATE_SUB(NOW(), INTERVAL -30 DAY) and status = 2;")
+    List<Integer> getExpiredTaskIds();
 }

@@ -4,6 +4,7 @@ package com.example.controller;
 import com.example.entity.RestBean;
 import com.example.entity.vo.request.SubtaskStatusVO;
 import com.example.entity.vo.request.TaskSaveVO;
+import com.example.entity.vo.response.SubtaskVO;
 import com.example.entity.vo.response.TaskListVO;
 import com.example.service.DevelopService;
 import com.example.utils.Const;
@@ -52,5 +53,11 @@ public class TaskController {
                                         @RequestBody SubtaskStatusVO subtaskStatusVO){
         developService.updateSubtaskStatus(subtaskStatusVO,userId);
         return RestBean.success();
+    }
+
+    @GetMapping("/getAllSubtask")
+    public RestBean<List<SubtaskVO>> getAllSubtask(@RequestAttribute(Const.ATTR_USER_ID) Integer userId,
+                                                   @RequestAttribute(Const.ATTR_USER_ROLE) String role){
+        return RestBean.success(developService.getAllSubtask(userId,role));
     }
 }

@@ -9,4 +9,7 @@ import java.util.List;
 
 @Mapper
 public interface AccountMapper extends BaseMapper<Account> {
+
+    @Select("select clients from db_account where id = #{userId}")
+    String getClientsById(Integer userId);
 }

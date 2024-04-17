@@ -1,5 +1,6 @@
 package com.example.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.entity.dto.ClientDetail;
 import com.example.entity.dto.ClientSsh;
@@ -12,6 +13,7 @@ import com.example.entity.vo.response.SshSettingsVO;
 import com.example.mapper.ClientDetailMapper;
 import com.example.mapper.ClientSshMapper;
 import com.example.service.ClientSshService;
+import com.example.utils.Const;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import jakarta.annotation.Resource;
@@ -19,6 +21,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -96,6 +99,26 @@ public class ClientSshServiceImpl extends ServiceImpl<ClientSshMapper, ClientSsh
             return "服务器并未在系统注册";
         sshTestVO.setIp(clientDetail.getIp());
         return testSsh(sshTestVO);
+    }
+
+    @Override
+    public String deleteClientSsh(Integer id, Integer userId, String role) {
+        if (!Const.ROLE_ADMIN.equals(role.substring(5))){
+            if (!this.getById(id).getUserId().equals(userId)){
+                return "权限不足";
+            }
+        }
+        return this.getBaseMapper().deleteById(id) > 0 ? "删除成功" : "删除失败";
+    }
+
+    @Override
+    public List<SshConnectionVO> getSshByClient(Integer clientId,Integer userId) {
+        List<ClientSsh> clientSshes = this.baseMapper.selectList(new QueryWrapper<ClientSsh>()
+                .eq("client_id", clientId)
+                .eq("user_id", userId));
+        List<SshConnectionVO> clientSshVOS = new ArrayList<>();
+        clientSshes.forEach(clientSsh -> clientSshVOS.add(clientSsh.asViewObject(SshConnectionVO.class)));
+        return clientSshVOS;
     }
 
     private  String testSsh(SshTestVO ssh) {

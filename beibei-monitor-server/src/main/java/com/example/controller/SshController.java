@@ -47,6 +47,23 @@ public class SshController {
         return RestBean.success(clientSshService.saveClientSshConnection(vo, userId));
     }
 
+    @GetMapping("/delete")
+    public RestBean<String> deleteSsh(@RequestParam("id") Integer id,
+                                    @RequestAttribute(Const.ATTR_USER_ID) Integer userId,
+                                    @RequestAttribute(Const.ATTR_USER_ROLE) String role) {
+        String res = clientSshService.deleteClientSsh(id, userId, role);
+        if (res.equals("删除成功")){
+            return RestBean.success("删除成功");
+        }
+        return  RestBean.failure(403,res);
+    }
+
+    @GetMapping("/getSshByClient")
+    public RestBean<List<SshConnectionVO>> getSshByClient(@RequestParam("clientId") Integer clientId,
+                                                          @RequestAttribute(Const.ATTR_USER_ID) Integer userId){
+        return RestBean.success(clientSshService.getSshByClient(clientId,userId));
+    }
+
     @GetMapping("/ssh")
     public RestBean<SshSettingsVO> sshSettings(Integer clientId,
                                                @RequestAttribute(Const.ATTR_USER_ID) Integer userId,

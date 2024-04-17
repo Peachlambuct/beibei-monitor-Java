@@ -15,4 +15,8 @@ public interface ClientSshService extends IService<ClientSsh> {
     SshConnectionVO saveClientSshConnection(SshSaveVO vo, Integer userId);
     SshSettingsVO sshSettings(Integer clientId);
     String testConnection(SshTestVO sshTestVO);
+
+    String deleteClientSsh(Integer id, Integer userId, String role);
+
+    List<SshConnectionVO> getSshByClient(Integer clientId,Integer userId);
 }
