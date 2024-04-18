@@ -11,11 +11,12 @@ public class SubtaskVO implements BaseData {
     String name;
     Integer taskId;
     String description;
-    String aboutClientId;
+    String aboutClients;
+    String principals;
     String taskType;
     Date startTime;
     Date endTime;
     Date updateTime;
-    Integer updateUserId;
+    String updateUserName;
     Integer status;
 }

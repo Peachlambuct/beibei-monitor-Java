@@ -8,10 +8,7 @@ import java.util.List;
 
 @Data
 public class WarnVO {
-    @NotNull
     Double cpuUsage;
-    @NotNull
     Double memoryUsage;
-    @NotNull
     List<WarnProcessInfo> warnProcessInfos;
 }

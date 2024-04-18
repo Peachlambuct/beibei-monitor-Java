@@ -54,7 +54,7 @@ public class SecurityConfiguration {
         return http
                 .authorizeHttpRequests(conf -> conf
                         .requestMatchers("/terminal/**").permitAll()
-                        .requestMatchers("/api/auth/**", "/error").permitAll()
+                        .requestMatchers("/api/auth/**", "/error","/chat/**").permitAll()
                         .requestMatchers("/monitor/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/api/user/sub/**").hasRole(Const.ROLE_ADMIN)

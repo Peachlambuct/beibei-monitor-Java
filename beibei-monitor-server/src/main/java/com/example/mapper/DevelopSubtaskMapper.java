@@ -13,7 +13,9 @@ import java.util.List;
 @Mapper
 public interface DevelopSubtaskMapper extends BaseMapper<DevelopSubtask> {
 
-    @Select("select s.*,t.about_client_id,t.type as taskType from db_develop_subtask s " +
-            "join db_develop_task t on s.task_id = t.id")
-    List<SubtaskVO> getSubtaskAndType();
+    @Select("select s.*, t.about_client_id as aboutClients, t.type as taskType, t.principal_ids as principals, u.username as updateUserName " +
+            "from db_develop_subtask s " +
+            "join db_develop_task t on s.task_id = t.id " +
+            "join db_account u on s.update_user_id = u.id")
+    List<SubtaskVO> getSubtask();
 }

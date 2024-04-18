@@ -30,7 +30,7 @@ public class RequestLogFilter extends OncePerRequestFilter {
     SnowflakeIdGenerator generator;
 
     private final Set<String> ignores = Set.of("/swagger-ui", "/v3/api-docs", "/monitor/runtime",
-            "/api/monitor/list");
+            "/api/monitor/list","/chat/stream","/chat/sse-test");
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {

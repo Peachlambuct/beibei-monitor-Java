@@ -1,7 +1,7 @@
 <script setup>
 import {osNameToIcon} from "@/tools";
-import {ref} from "vue";
-import {get} from "@/net";
+import {onUnmounted, ref} from "vue";
+import { get } from "@/net";
 import {useStore} from "@/store";
 
 const store = useStore()
@@ -12,37 +12,73 @@ if (store.isAdmin) {
   })
 }
 
+const warn = ref([])
+get('/api/warn/yesterday', data => {
+  warn.value = data
+})
 
-const warn = {
-  count: 3,
-  list: [
-    {
-      name: 'Spark01节点',
-      time: '23时24分',
-      content: 'CPU内存超标',
-      status: '已提醒'
-    },
-    {
-      name: 'Spark02节点',
-      time: '23时24分',
-      content: '内存超标',
-      status: '已提醒'
-    },
-    {
-      name: 'Spark03节点',
-      time: '23时24分',
-      content: 'CPU超标',
-      status: '已提醒'
-    },
-    {
-      name: 'Centos01节点',
-      time: '23时24分',
-      content: 'CPU超标',
-      status: '已提醒'
-    }
-  ]
+
+const localhostRuntimeData = ref()
+const getLocalhostRuntimeData = () => {
+  get('/api/monitor/getCurrentClientDetails', data => {
+    localhostRuntimeData.value = data
+  })
 }
 
+let intervalId = null;
+const fetchData = () => {
+  getLocalhostRuntimeData();
+  if (store.isAdmin) {
+    get('/api/monitor/simple-list', list => {
+      simpleList.value = list;
+    });
+  }
+};
+
+fetchData();
+intervalId = setInterval(fetchData, 10000);
+
+onUnmounted(() => {
+  if (intervalId) {
+    clearInterval(intervalId);
+  }
+});
+
+const newMessage = ref('');
+const messages = ref([]);
+
+
+let currentAIResponse = ref(null);
+
+const sendMessage = () => {
+  messages.value.push({
+    id: messages.value.length,
+    text: newMessage.value,
+    sender: 'user'
+  });
+  currentAIResponse = ref({
+    id: messages.value.length,
+    text: '',
+    sender: 'ai'
+  });
+  messages.value.push(currentAIResponse.value);
+  getAIResponse(newMessage.value);
+  newMessage.value = '';
+};
+
+const getAIResponse = (input) => {
+  const eventSource = new EventSource(`http://localhost:8080/chat/stream?input=${input}`);
+
+  eventSource.onmessage = (event) => {
+    currentAIResponse.value.text += event.data;
+  };
+
+  eventSource.onerror = (error) => {
+    console.error("Fetch failed:", error);
+    eventSource.close();
+    newMessage.value = ''
+  };
+};
 </script>
 
 <template>
@@ -68,22 +104,42 @@ const warn = {
     <div style="width: 100%;height: 400px;display: flex">
       <div style="flex: 5;">
         <div class="server-info-card">
-          <span style="font-weight: bold;font-size: 30px;margin: 5px 10px">此服务器运行指标:</span>
-
+          <span class="title">此服务器运行指标:</span>
+          <div style="margin: 25px">
+            <div class="metrics">
+              <div class="metric" v-if="localhostRuntimeData">
+                <span>CPU占用量: </span>
+                <span class="value">{{ localhostRuntimeData.cpuUsage.toFixed(2) }}%</span>
+              </div>
+              <div class="metric" v-if="localhostRuntimeData">
+                <span>内存占用量: </span>
+                <span class="value">{{ localhostRuntimeData.memoryUsage.toFixed(2) }}%</span>
+              </div>
+            </div>
+            <div class="metrics" style="margin-top: 10px">
+              <div class="metric" v-if="localhostRuntimeData">
+                <span>磁盘使用量: </span>
+                <span class="value">{{ localhostRuntimeData.diskUsage }}MB</span>
+              </div>
+              <div class="metric" v-if="localhostRuntimeData">
+                <span>网络上行: </span>
+                <span class="value">{{ localhostRuntimeData.networkUpload.toFixed(2) }}KB/s</span>
+              </div>
+            </div>
+          </div>
         </div>
         <div
             style="height: calc((100% - 20px) / 2);background-color: #f5f4f1;border-radius: 20px;box-shadow: inset 0 0 3px #b9b8b8;margin-top: 20px">
           <span style="font-weight: bold;font-size: 30px;margin: 5px 10px">昨日服务器<span style="color: #c6bd1a;">告警</span>:</span>
-          <span style="font-weight: bold;font-size: 27px;margin: 0 10px">{{warn.count}}</span>
+          <span style="font-weight: bold;font-size: 27px;margin: 0 10px">{{warn.length}}</span>
           <div style="margin: 0 10px;height: calc((100% - 32px))">
             <el-scrollbar :style="{ 'max-height': 'calc(100% - 20px)' }">
-              <div class="warn-card" v-for="item in warn.list" style="position: relative">
+              <div class="warn-card" v-for="item in warn" style="position: relative">
                 <div style="font-weight: bold">
-                  {{item.name}}：
+                  {{item.clientName}}：
                 </div>
                 <div style="font-size: 15px;color: #747474">
-                  {{item.content}}----- {{ item.time }}
-                  <el-tag style="position: absolute; right: 10px;">{{item.status}}</el-tag>
+                  {{item.description}}-------- {{ item.time }}
                 </div>
               </div>
             </el-scrollbar>
@@ -122,10 +178,18 @@ const warn = {
       </div>
     </div>
     <el-divider style="margin: 45px 0"/>
-    <div style="background-color: #efece6;height: 500px;border-radius: 10px">
-      <div style="font-weight: bold;font-size: 30px;margin: 5px 10px">开发进度</div>
-
-    </div>
+    <el-scrollbar max-height="500">
+      <div style="height: 500px">
+        <div style="font-weight: bold;font-size: 22px">AI助手</div>
+        <div style="width: 80%; margin: auto;">
+          <div v-for="(message, index) in messages" :key="index" :class="message.sender" v-html="message.text">
+          </div>
+          <div>
+            <input v-model="newMessage" @keyup.enter="sendMessage" placeholder="Type your message here..." />
+          </div>
+        </div>
+      </div>
+    </el-scrollbar>
   </div>
 </template>
 
@@ -133,10 +197,38 @@ const warn = {
 .server-info-card {
   height: calc((100% - 20px) / 2);
   background-image: linear-gradient(to right, #d4eaf7, #b6ccd8);
-  border-radius: 20px
+  border-radius: 20px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+}
+.title {
+  font-weight: bold;
+  font-size: 30px;
+  margin-bottom: 10px;
 }
 
+.metrics {
+  display: flex;
+  justify-content: space-between;
+}
 
+.metric {
+  background-color: #f5f5f5;
+  padding: 10px;
+  border-radius: 10px;
+  width: 160px;
+}
+
+.value {
+  font-weight: bold;
+  color: #333;
+}
+
+.box-card {
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  border-radius: 4px;
+  overflow: hidden;
+}
 .overview-client-card {
   border-radius: 5px;
   background-color: #e3e8ea;
@@ -151,5 +243,27 @@ const warn = {
   margin: 10px;
   border-radius: 10px;
   padding: 10px;
+}
+
+.user {
+  text-align: right;
+  background-color: #dbdbdb;
+  margin: 10px;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.ai {
+  text-align: left;
+  background-color: #c3dbe6;
+  margin: 10px;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
 }
 </style>

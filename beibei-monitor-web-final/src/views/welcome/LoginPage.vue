@@ -1,6 +1,6 @@
 <template>
   <div style="text-align: center;margin: 0 20px">
-    <div style="margin-top: 150px">
+    <div style="margin-top: 100px">
       <div style="font-size: 25px;font-weight: bold">登录</div>
       <div style="font-size: 14px;color: grey">在进入系统之前请先输入用户名和密码进行登录</div>
     </div>
@@ -36,7 +36,7 @@
         </el-row>
       </el-form>
     </div>
-    <div style="margin-top: 40px">
+    <div style="margin: 40px">
       <el-button  @keydown.enter="userLogin"  @click="userLogin()" style="width: 270px" type="success" plain>立即登录</el-button>
     </div>
   </div>

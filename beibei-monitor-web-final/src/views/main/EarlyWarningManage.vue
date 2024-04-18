@@ -17,6 +17,14 @@ const registerTable = reactive({
 })
 const serverList = ref([])
 
+function clearTable() {
+  registerTable.id = ''
+  registerTable.name = ''
+  registerTable.description = ''
+  registerTable.clientId = ''
+  registerTable.cpuWarn = 80
+  registerTable.memoryWarn = 80
+}
 
 const warnList = ref([])
 function getWarnList() {
@@ -42,6 +50,7 @@ function registerWarnRule() {
     ElMessage.success('预警规则添加成功')
     getWarnList()
     addWarn.value = false
+    clearTable()
   })
 }
 </script>

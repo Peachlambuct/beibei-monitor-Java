@@ -1,14 +1,16 @@
 <script setup>
 import {reactive, ref, watch} from "vue";
-import {get, post} from "@/net";
-import {ElMessage} from "element-plus";
 import Terminal from "@/component/Terminal.vue";
 
 const props = defineProps({
   id: Number,
   data: Object
 })
+const terminalRef = ref();
 
+const closeTerminalConnection = () => {
+  terminalRef.value.closeConnection();
+};
 const rules = {
   port: [
     { required: true, message: '请输入端口', trigger: ['blur', 'change'] },
@@ -21,8 +23,13 @@ const rules = {
   ]
 }
 
+
 const state = ref(1)
 const formRef = ref()
+defineExpose({
+  closeTerminalConnection
+});
+
 </script>
 
 <template>
@@ -50,8 +57,8 @@ const formRef = ref()
       </el-form>
     </div>
     <div v-if="state === 2">
-      <div style="overflow: hidden;padding: 0 10px 10px 10px">
-        <terminal :id="id" @dispose="state = 1"/>
+      <div style="height: 470px;overflow: hidden;padding: 0 10px 10px 10px">
+        <terminal ref="terminalRef" :id="id" @dispose="state = 1"/>
       </div>
     </div>
   </div>

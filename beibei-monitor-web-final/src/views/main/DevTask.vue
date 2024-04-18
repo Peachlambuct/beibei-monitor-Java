@@ -6,7 +6,7 @@ import {get} from "@/net";
 
 const taskList = ref([])
 function getList() {
-  get('/api/task/list', data => {
+  get('/api/task/getAllSubtask', data => {
     taskList.value = data.map(task => {
       const startDate = new Date(task.startTime);
       const endDate = new Date(task.endTime);

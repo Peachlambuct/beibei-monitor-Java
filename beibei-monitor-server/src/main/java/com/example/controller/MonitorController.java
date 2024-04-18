@@ -82,7 +82,7 @@ public class MonitorController {
     }
 
     @GetMapping("/getCurrentClientDetails")
-    public RestBean<CurrentClientDetailsVO> getCurrentClientDetails(@RequestAttribute(Const.ATTR_USER_ROLE) String role){
+    public RestBean<RuntimeDetailVO> getCurrentClientDetails(@RequestAttribute(Const.ATTR_USER_ROLE) String role){
         return RestBean.success(service.getCurrentClientDetails(role));
     }
 

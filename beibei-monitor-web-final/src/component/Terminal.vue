@@ -21,11 +21,16 @@ socket.onclose = evt => {
   }
   emits('dispose')
 }
+const closeConnection = () => {
+  socket.close();
+  term.dispose();
+  emits('dispose');
+};
 const attachAddon = new AttachAddon(socket);
 const term = new Terminal({
-  lineHeight: 1.2,
+  lineHeight: 1.5,
   rows: 20,
-  fontSize: 13,
+  fontSize: 14,
   fontFamily: "Monaco, Menlo, Consolas, 'Courier New', monospace",
   fontWeight: "bold",
   theme: {
@@ -38,7 +43,7 @@ const term = new Terminal({
   tabStopWidth: 4,
 });
 term.loadAddon(attachAddon);
-
+term.resize(100,50)
 onMounted(() => {
   term.open(terminalRef.value)
   term.focus()
@@ -47,7 +52,13 @@ onMounted(() => {
 onBeforeUnmount(() => {
   socket.close()
   term.dispose()
+  emits('dispose')
 })
+
+defineExpose({
+  closeConnection,
+});
+
 </script>
 
 <template>

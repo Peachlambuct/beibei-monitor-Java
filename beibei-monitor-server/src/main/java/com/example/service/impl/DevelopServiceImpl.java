@@ -57,17 +57,28 @@ public class DevelopServiceImpl extends ServiceImpl<DevelopTaskMapper, DevelopTa
             // 获取任务相关客户端id列表
             List<Integer> aboutClientIdList = JSONArray.parseArray(task.getAboutClientId(), Integer.class);
             // 获取任务相关用户姓名列表
-            QueryWrapper<Account> queryWrapper = new QueryWrapper<>();
-            queryWrapper.in("id", principalIdList);
-            List<Account> accounts = accountMapper.selectList(queryWrapper);
-            ArrayList<String> principalNames = new ArrayList<>();
-            accounts.forEach(account -> principalNames.add(account.getUsername()));
+            ArrayList<String> principalNames, aboutClientNames;
+            if (!principalIdList.isEmpty()) {
+                QueryWrapper<Account> queryWrapper = new QueryWrapper<>();
+                queryWrapper.in("id", principalIdList);
+                List<Account> accounts = accountMapper.selectList(queryWrapper);
+                principalNames = new ArrayList<>();
+                accounts.forEach(account -> principalNames.add(account.getUsername()));
+            } else {
+                principalNames = null;
+            }
             // 获取任务相关客户端名称列表
-            QueryWrapper<Client> clientQueryWrapper = new QueryWrapper<>();
-            clientQueryWrapper.in("id", aboutClientIdList);
-            List<Client> clients = clientMapper.selectList(clientQueryWrapper);
-            ArrayList<String> aboutClientNames = new ArrayList<>();
-            clients.forEach(client -> aboutClientNames.add(client.getName()));
+
+            if (!aboutClientIdList.isEmpty()) {
+                QueryWrapper<Client> clientQueryWrapper = new QueryWrapper<>();
+                clientQueryWrapper.in("id", aboutClientIdList);
+                List<Client> clients = clientMapper.selectList(clientQueryWrapper);
+                aboutClientNames = new ArrayList<>();
+                clients.forEach(client -> aboutClientNames.add(client.getName()));
+            } else {
+                aboutClientNames = null;
+            }
+
             // 生成任务VO对象
             TaskListVO taskListVO = new TaskListVO();
             BeanUtils.copyProperties(task, taskListVO);
@@ -109,20 +120,26 @@ public class DevelopServiceImpl extends ServiceImpl<DevelopTaskMapper, DevelopTa
                 JSONArray.copyOf(task.getAboutClientId()).toJSONString(), task.getStartTime(),
                 task.getEndTime(), null);
         List<SubtaskSaveVO> subtasks = task.getSubtasks();
-        if (task.getId() != null){
+        if (task.getId() != null) {
             developTask.setId(task.getId());
             this.updateById(developTask);
-        }else {
+        } else {
             this.save(developTask);
         }
-        subtaskMapper.delete(new QueryWrapper<DevelopSubtask>().eq("task_id",task.getId()));
-        for (SubtaskSaveVO subtaskVo : subtasks){
+        List<DevelopSubtask> subtaskList = subtaskMapper.selectList(
+                new QueryWrapper<DevelopSubtask>().eq("task_id", developTask.getId()));
+        for (SubtaskSaveVO subtaskVo : subtasks) {
             DevelopSubtask subtask = new DevelopSubtask();
-            BeanUtils.copyProperties(subtaskVo,subtask);
+            BeanUtils.copyProperties(subtaskVo, subtask);
+            subtaskList.removeIf(subtask1 -> subtask1.getId().equals(subtask.getId()));
             subtask.setTaskId(task.getId());
-            subtask.setId(null);
-            subtaskMapper.insert(subtask);
+            if (subtask.getId() != null) {
+                subtaskMapper.updateById(subtask);
+            } else {
+                subtaskMapper.insert(subtask);
+            }
         }
+        subtaskList.forEach(subtask -> subtaskMapper.deleteById(subtask.getId()));
     }
 
     @Override
@@ -147,10 +164,20 @@ public class DevelopServiceImpl extends ServiceImpl<DevelopTaskMapper, DevelopTa
 
     @Override
     public List<SubtaskVO> getAllSubtask(Integer userId, String role) {
-        List<SubtaskVO> subtaskVOS = subtaskMapper.getSubtaskAndType();
+        List<SubtaskVO> subtaskVOS = subtaskMapper.getSubtask();
         if (!Const.ROLE_ADMIN.equals(role.substring(5))) {
             List<Integer> taskIdList = developTaskMapper.getTaskIdsByUserId(userId);
             subtaskVOS.removeIf(subtaskVO -> !taskIdList.contains(subtaskVO.getTaskId()));
+            subtaskVOS.forEach(subtaskVO -> {
+                clientMapper.selectList(new QueryWrapper<Client>()
+                                .in("id", JSONArray.parseArray(subtaskVO.getAboutClients(), Integer.class)))
+                        .stream().map(Client::getName).reduce((s1, s2) -> s1 + ", " + s2)
+                        .ifPresent(subtaskVO::setAboutClients);
+                accountMapper.selectList(new QueryWrapper<Account>()
+                                .in("id", JSONArray.parseArray(subtaskVO.getPrincipals(), Integer.class)))
+                        .stream().map(Account::getUsername).reduce((s1, s2) -> s1 + ", " + s2)
+                        .ifPresent(subtaskVO::setPrincipals);
+            });
         }
         return subtaskVOS;
     }

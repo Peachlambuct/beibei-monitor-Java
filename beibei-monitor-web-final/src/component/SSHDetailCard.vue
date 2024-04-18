@@ -2,7 +2,7 @@
 
 import {Delete} from "@element-plus/icons-vue";
 import TerminalWindow from "@/component/TerminalWindow.vue";
-import {reactive} from "vue";
+import {reactive, ref} from "vue";
 import {get} from "@/net";
 import {ElMessage} from "element-plus";
 
@@ -13,8 +13,12 @@ const terminal = reactive({
   show: false,
   id: -1
 })
-const emit = defineEmits(['flash', 'update'])
+const terminalWindowRef = ref(null);
 
+const emit = defineEmits(['flash', 'update'])
+const closeConnect = () => {
+  terminalWindowRef.value.closeTerminalConnection();
+}
 function deleteSSH(id) {
   get(`/api/ssh/delete?id=${id}`, () => {
     ElMessage.success("SSH信息删除成功")
@@ -39,18 +43,18 @@ function deleteSSH(id) {
       <el-button style="float: right;margin-right: 10px;margin-top: 10px" color="#f5f5e9" :icon="Delete" type="primary"
                  @click="deleteSSH(data.id)">删除SSH连接信息</el-button>
     </div>
-    <el-drawer style="width: 800px" :size="520" direction="btt"
-               @close="terminal.id = -1"
+    <el-drawer style="width: 1000px" :size="620" direction="btt"
                v-model="terminal.show" :close-on-click-modal="false">
       <template #header>
         <div>
           <div style="font-size: 18px;color: #96b0cd;font-weight: bold;">SSH远程连接</div>
           <div style="font-size: 14px">
             远程连接的建立将由服务端完成，因此在内网环境下也可以正常使用。
+            <el-button type="primary" style="float: right;" @click="closeConnect">关闭连接</el-button>
           </div>
         </div>
       </template>
-      <terminal-window :id="data.id" :data="data"/>
+      <terminal-window ref="terminalWindowRef" :id="data.id" :data="data"/>
     </el-drawer>
   </div>
 </template>

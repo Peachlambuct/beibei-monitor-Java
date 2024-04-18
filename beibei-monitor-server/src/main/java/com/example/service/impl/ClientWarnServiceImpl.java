@@ -1,12 +1,16 @@
 package com.example.service.impl;
 
 import com.alibaba.fastjson2.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.example.entity.dto.Account;
 import com.example.entity.dto.ClientWarn;
 import com.example.entity.dto.ClientWarnRules;
 import com.example.entity.dto.WarnProcessInfo;
 import com.example.entity.vo.request.WarnVO;
 import com.example.entity.vo.response.ClientWarnVO;
+import com.example.entity.vo.response.YesterdayWarnVO;
+import com.example.mapper.AccountMapper;
 import com.example.mapper.ClientMapper;
 import com.example.mapper.ClientWarnMapper;
 import com.example.mapper.ClientWarnRulesMapper;
@@ -28,6 +32,10 @@ public class ClientWarnServiceImpl extends ServiceImpl<ClientWarnMapper, ClientW
 
     @Resource
     ClientMapper clientMapper;
+
+    @Resource
+    AccountMapper accountMapper;
+
     @Resource
     ClientWarnRulesMapper clientWarnRulesMapper;
 
@@ -52,6 +60,16 @@ public class ClientWarnServiceImpl extends ServiceImpl<ClientWarnMapper, ClientW
         return clientWarnVOS;
     }
 
+    @Override
+    public List<YesterdayWarnVO> listYesterdayWarn(String role,Integer userId) {
+        List<YesterdayWarnVO> yesterdayWarn = baseMapper.getYesterdayWarn();
+        if (!Const.ROLE_ADMIN.equals(role.substring(5))){
+            List<Integer> clients = JSON.parseArray(accountMapper.selectById(userId).getClients(),Integer.class);
+            yesterdayWarn.removeIf(warn -> !clients.contains(warn.getClientId()));
+        }
+        return yesterdayWarn;
+    }
+
     /**
      * 处理告警信息
      * @param warnVO top5进程
@@ -62,7 +80,6 @@ public class ClientWarnServiceImpl extends ServiceImpl<ClientWarnMapper, ClientW
     public void processWarn(WarnVO warnVO, int clientId) {
         // 根据客户端id获取阈值
         ClientWarnRules warnRule = clientWarnRulesMapper.getInfoByClientId(clientId);
-
         if (Objects.isNull(warnRule) ||
                 (warnRule.getCpuWarn() > warnVO.getCpuUsage() && warnRule.getMemoryWarn() > warnVO.getMemoryUsage()))
             return;

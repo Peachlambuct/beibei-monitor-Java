@@ -7,13 +7,13 @@ const show = ref(false)
 const checkedNodes = ref([])
 const selectedTasks = ref([])
 let taskTypes = []
-
 function getPage() {
   get('/api/task/getAllSubtask', data => {
     taskList.value = data.map(task => {
       const date = new Date(task.startTime);
       task.startTime = date.toLocaleDateString('en-CA');
       task.endTime = date.toLocaleDateString('en-CA');
+      task.updateTime = date.toLocaleDateString('en-CA');
       return task;
     });
     taskList.value.sort((a, b) => new Date(b.startTime) - new Date(a.startTime));

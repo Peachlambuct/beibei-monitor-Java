@@ -56,11 +56,22 @@ function getList() {
   })
 }
 
+function clearTable() {
+  sshTable.id = ''
+  sshTable.name = ''
+  sshTable.ip = ''
+  sshTable.port = '22'
+  sshTable.username = ''
+  sshTable.password = ''
+  sshTable.clientId = ''
+}
+
 function save() {
   post('/api/ssh/ssh-save', sshTable, () => {
     ElMessage.success("保存成功")
     getList()
     show.value = false
+    clearTable()
   })
 }
 
@@ -104,7 +115,7 @@ watch(checkedNodes, getList);
       </div>
     </div>
 
-    <el-dialog v-model="show">
+    <el-dialog v-model="show" @close="clearTable">
       <el-form label-width="100">
         <el-form-item label="SSH服务器">
           <el-select placeholder="请选择服务器" v-model="sshTable.clientId" @change="handleServerChange">

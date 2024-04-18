@@ -175,15 +175,13 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
     }
 
     @Override
-    public CurrentClientDetailsVO getCurrentClientDetails(String role) {
+    public RuntimeDetailVO getCurrentClientDetails(String role) {
         if (!Const.ROLE_ADMIN.equals(role.substring(5)))
             return null;
-        CurrentClientDetailsVO vo = new CurrentClientDetailsVO();
         Integer clientId = detailMapper.getIdByIp(currentIp);
-        vo.setClientDetailsVO(clientDetails(clientId));
-        vo.setRuntimeDetailVO(clientRuntimeDetailsNow(clientId));
-        vo.setRuntimeHistoryVO(clientRuntimeDetailsHistory(clientId));
-        return vo;
+        if (clientId == null)
+            return null;
+        return clientRuntimeDetailsNow(clientId);
     }
 
     private boolean isOnline(RuntimeDetailVO runtime) {

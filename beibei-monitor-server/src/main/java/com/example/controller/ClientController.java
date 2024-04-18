@@ -6,17 +6,12 @@ import com.example.entity.dto.ClientWarnRules;
 import com.example.entity.vo.request.ClientDetailVO;
 import com.example.entity.vo.request.RuntimeDetailVO;
 import com.example.entity.vo.request.WarnVO;
-import com.example.entity.vo.response.ClientNameVO;
 import com.example.service.ClientService;
-import com.example.service.ClientWarnRulesService;
 import com.example.service.ClientWarnService;
 import com.example.utils.Const;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
-import retrofit2.http.GET;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/monitor")
@@ -52,6 +47,7 @@ public class ClientController {
     @PostMapping("/processWarn")
     public RestBean<Void> processWarn(@RequestBody WarnVO warnVO,
                                       @RequestAttribute(Const.ATTR_CLIENT) Client client) {
+        System.out.println(warnVO);
         clientWarnService.processWarn(warnVO,client.getId());
         return RestBean.success();
     }
