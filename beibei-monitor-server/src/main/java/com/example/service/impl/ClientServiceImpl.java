@@ -14,6 +14,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> implements ClientService {
+
+    @Value("${spring.monitor.current-client-ip}")
+    private String currentIp;
 
     private String registerToken = this.generateNewToken();
 
@@ -168,6 +172,18 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
                     -> JSON.parseArray(clients, Integer.class).contains(vo.getClientId())).toList();
         }
         return clientNameVOS;
+    }
+
+    @Override
+    public CurrentClientDetailsVO getCurrentClientDetails(String role) {
+        if (!Const.ROLE_ADMIN.equals(role.substring(5)))
+            return null;
+        CurrentClientDetailsVO vo = new CurrentClientDetailsVO();
+        Integer clientId = detailMapper.getIdByIp(currentIp);
+        vo.setClientDetailsVO(clientDetails(clientId));
+        vo.setRuntimeDetailVO(clientRuntimeDetailsNow(clientId));
+        vo.setRuntimeHistoryVO(clientRuntimeDetailsHistory(clientId));
+        return vo;
     }
 
     private boolean isOnline(RuntimeDetailVO runtime) {

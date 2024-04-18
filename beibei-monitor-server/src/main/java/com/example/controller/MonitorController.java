@@ -81,10 +81,15 @@ public class MonitorController {
         }
     }
 
+    @GetMapping("/getCurrentClientDetails")
+    public RestBean<CurrentClientDetailsVO> getCurrentClientDetails(@RequestAttribute(Const.ATTR_USER_ROLE) String role){
+        return RestBean.success(service.getCurrentClientDetails(role));
+    }
+
     @GetMapping("/details")
     public RestBean<ClientDetailsVO> details(int clientId,
-                                             @RequestAttribute(Const.ATTR_USER_ID) int userId,
-                                             @RequestAttribute(Const.ATTR_USER_ROLE) String userRole) {
+                                                                    @RequestAttribute(Const.ATTR_USER_ID) int userId,
+                                                                    @RequestAttribute(Const.ATTR_USER_ROLE) String userRole) {
         if(this.permissionCheck(userId, userRole, clientId)) {
             return RestBean.success(service.clientDetails(clientId));
         } else {

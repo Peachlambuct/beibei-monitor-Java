@@ -41,12 +41,9 @@ public class TaskController {
     }
 
     @PostMapping("/saveTask")
-    public RestBean<Void> saveTask(@RequestBody TaskSaveVO task){
-        if (task.getId() != null) {
-            developService.updateTask(task);
-        } else {
-            developService.addTask(task);
-        }
+    public RestBean<Void> saveTask(@RequestAttribute(Const.ATTR_USER_ROLE)String role,
+                                   @RequestBody TaskSaveVO task){
+        developService.saveTask(task,role);
         return RestBean.success();
     }
 

@@ -24,4 +24,5 @@ public interface ClientService extends IService<Client> {
     RuntimeDetailVO clientRuntimeDetailsNow(int clientId);
     void deleteClient(int clientId);
     List<ClientNameVO> getClientNameList(Integer userId, String role);
+    CurrentClientDetailsVO getCurrentClientDetails(String role);
 }

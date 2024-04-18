@@ -2,6 +2,7 @@ package com.example.service.impl;
 
 
 import com.alibaba.fastjson2.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.entity.dto.ClientWarnRules;
 import com.example.entity.vo.response.ClientWarnRulesVO;
@@ -24,8 +25,12 @@ public class ClientWarnRulesServiceImpl extends ServiceImpl<ClientWarnRulesMappe
     AccountMapper accountMapper;
 
     @Override
-    public void addWarnRule(ClientWarnRules warnRule) {
+    public String addWarnRule(ClientWarnRules warnRule) {
+        if (this.baseMapper.selectList(
+                new QueryWrapper<ClientWarnRules>().eq("client_id",warnRule.getClientId())).size() > 0)
+            return "该客户端规则已存在";
         this.save(warnRule);
+        return "添加成功";
     }
 
     @Override

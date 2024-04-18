@@ -11,13 +11,9 @@ import com.example.entity.vo.response.TaskListVO;
 import java.util.List;
 
 public interface DevelopService extends IService<DevelopTask> {
-    void addTask(TaskSaveVO task);
-
     List<TaskListVO> getMainTask(Integer userId, String role);
 
     void deleteTask(Integer taskId);
-
-    void updateTask(TaskSaveVO task);
 
     void deleteSubtask(Integer subtaskId);
 
@@ -28,4 +24,6 @@ public interface DevelopService extends IService<DevelopTask> {
     void deleteExpiredTasks();
 
     List<SimpleTaskVO> getTaskByClientId(Integer clientId);
+
+    void saveTask(TaskSaveVO task, String role);
 }

@@ -19,9 +19,13 @@ public class WarnRulesController {
     ClientWarnRulesService clientWarnRulesService;
 
     @PostMapping("/addWarnRule")
-    public RestBean<Void> addWarnRule(@RequestBody ClientWarnRules warnRule) {
-        clientWarnRulesService.addWarnRule(warnRule);
-        return RestBean.success();
+    public RestBean<String> addWarnRule(@RequestBody ClientWarnRules warnRule) {
+        String res = clientWarnRulesService.addWarnRule(warnRule);
+        if ("添加成功".equals(res)){
+            return RestBean.success(res);
+        }else {
+            return RestBean.failure(400,res);
+        }
     }
 
     @PostMapping("/updateWarnRule")

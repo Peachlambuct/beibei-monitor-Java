@@ -7,7 +7,7 @@ import com.example.entity.vo.response.ClientWarnRulesVO;
 import java.util.List;
 
 public interface ClientWarnRulesService extends IService<ClientWarnRules> {
-    void addWarnRule(ClientWarnRules warnRule);
+    String addWarnRule(ClientWarnRules warnRule);
     void updateWarnRule(ClientWarnRules warnRule);
     void deleteWarnRule(Integer id);
     List<ClientWarnRulesVO> listAllWarnRules(Integer userId,String role);

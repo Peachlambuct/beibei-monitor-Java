@@ -47,3 +47,5 @@ spring:
     redis:
       host: 192.168.23.5
       port: 6379
+  monitor:
+    current-client-ip: 10.61.80.160

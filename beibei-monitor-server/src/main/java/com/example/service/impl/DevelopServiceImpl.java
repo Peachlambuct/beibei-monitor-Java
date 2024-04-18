@@ -27,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class DevelopServiceImpl extends ServiceImpl<DevelopTaskMapper, DevelopTask> implements DevelopService {
@@ -43,22 +42,6 @@ public class DevelopServiceImpl extends ServiceImpl<DevelopTaskMapper, DevelopTa
 
     @Resource
     DevelopSubtaskMapper subtaskMapper;
-
-    @Override
-    @Transactional
-    public void addTask(TaskSaveVO task) {
-        DevelopTask developTask = new DevelopTask(null, task.getName(), JSONArray.copyOf(task.getPrincipalIds()).toJSONString(), task.getType(),
-                task.getDescription(), JSONArray.copyOf(task.getAboutClientId()).toJSONString(), task.getStartTime(), task.getEndTime(), null);
-        List<SubtaskSaveVO> subtasks = task.getSubtasks();
-        this.save(developTask);
-
-        for (SubtaskSaveVO subtask : subtasks) {
-            DevelopSubtask developSubtask = new DevelopSubtask();
-            BeanUtils.copyProperties(subtask, developSubtask);
-            developSubtask.setTaskId(developTask.getId());
-            subtaskMapper.insert(developSubtask);
-        }
-    }
 
     @Override
     @Transactional
@@ -117,16 +100,29 @@ public class DevelopServiceImpl extends ServiceImpl<DevelopTaskMapper, DevelopTa
 
     @Override
     @Transactional
-    public void updateTask(TaskSaveVO task) {
-        DevelopTask developTask = new DevelopTask(task.getId(), task.getName(), JSONArray.copyOf(task.getPrincipalIds()).toJSONString(), task.getType(),
-                task.getDescription(), JSONArray.copyOf(task.getAboutClientId()).toJSONString(), task.getStartTime(), task.getEndTime(), null);
-        this.updateById(developTask);
-        task.getSubtasks().forEach(subtask -> {
-            DevelopSubtask developSubtask = new DevelopSubtask();
-            BeanUtils.copyProperties(subtask, developSubtask);
-            developSubtask.setTaskId(task.getId());
-            subtaskMapper.update(developSubtask, new QueryWrapper<DevelopSubtask>().eq("id", developSubtask.getId()));
-        });
+    public void saveTask(TaskSaveVO task, String role) {
+        if (!Const.ROLE_ADMIN.equals(role.substring(5)))
+            return;
+        DevelopTask developTask = new DevelopTask(null, task.getName(),
+                JSONArray.copyOf(task.getPrincipalIds()).toJSONString(),
+                task.getType(), task.getDescription(),
+                JSONArray.copyOf(task.getAboutClientId()).toJSONString(), task.getStartTime(),
+                task.getEndTime(), null);
+        List<SubtaskSaveVO> subtasks = task.getSubtasks();
+        if (task.getId() != null){
+            developTask.setId(task.getId());
+            this.updateById(developTask);
+        }else {
+            this.save(developTask);
+        }
+        subtaskMapper.delete(new QueryWrapper<DevelopSubtask>().eq("task_id",task.getId()));
+        for (SubtaskSaveVO subtaskVo : subtasks){
+            DevelopSubtask subtask = new DevelopSubtask();
+            BeanUtils.copyProperties(subtaskVo,subtask);
+            subtask.setTaskId(task.getId());
+            subtask.setId(null);
+            subtaskMapper.insert(subtask);
+        }
     }
 
     @Override
