@@ -67,6 +67,11 @@ const terminal = reactive({
   show: false,
   id: -1
 })
+
+const terminalWindow = ref()
+const closeConnect = () => {
+  terminalWindow.value.closeTerminalConnection()
+}
 </script>
 
 <template>
@@ -77,8 +82,6 @@ const terminal = reactive({
         <div class="desc">在这里管理所有已经注册的主机实例，实时监控主机运行状态，快速进行管理和操作。</div>
       </div>
       <div>
-        <el-button color="#b6ccd8" :icon="Download" type="primary" :disabled="!store.isAdmin"
-                   @click="register.show = true">下载客户端</el-button>
         <el-button color="#b6ccd8" :icon="Plus" type="primary" :disabled="!store.isAdmin"
                    @click="register.show = true">添加新主机</el-button>
       </div>
@@ -113,10 +116,11 @@ const terminal = reactive({
           <div style="font-size: 18px;color: dodgerblue;font-weight: bold;">SSH远程连接</div>
           <div style="font-size: 14px">
             远程连接的建立将由服务端完成，因此在内网环境下也可以正常使用。
+            <el-button style="float: right" type="primary" @click="closeConnect">关闭连接</el-button>
           </div>
         </div>
       </template>
-      <terminal-window :id="terminal.id" :data="terminal.data"/>
+      <terminal-window ref="terminalWindow" :id="terminal.id" :data="terminal.data"/>
     </el-drawer>
   </div>
 </template>

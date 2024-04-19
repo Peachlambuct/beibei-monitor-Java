@@ -2,7 +2,7 @@
 
 import {Plus} from "@element-plus/icons-vue";
 import WarnCard from "@/component/WarnCard.vue";
-import {reactive, ref} from "vue";
+import {onMounted, reactive, ref} from "vue";
 import {get, post} from "@/net";
 import {ElMessage} from "element-plus";
 
@@ -29,7 +29,7 @@ function clearTable() {
 const warnList = ref([])
 function getWarnList() {
   get('/api/warnRules/list', list => {
-    warnList.value = list
+    warnList.value.push(...list)
   })
 }
 
@@ -37,14 +37,12 @@ function getServerNameList() {
   get('/api/monitor/list', list => {
     serverList.length = 0
     list.forEach(item => {
-      serverList.value.push({label: item.name, value: item.id})
+      serverList.value.push({label: item.name, value: item.id, online: item.online })
     })
-    console.info(serverList.value)
   })
 }
 
-getWarnList()
-getServerNameList()
+
 function registerWarnRule() {
   post('/api/warnRules/addWarnRule', registerTable, () => {
     ElMessage.success('预警规则添加成功')
@@ -53,6 +51,11 @@ function registerWarnRule() {
     clearTable()
   })
 }
+
+onMounted(() => {
+  getWarnList()
+  getServerNameList()
+})
 </script>
 
 <template>

@@ -3,18 +3,19 @@ import {osNameToIcon} from "@/tools";
 import {onUnmounted, ref} from "vue";
 import { get } from "@/net";
 import {useStore} from "@/store";
+import router from "@/router";
 
 const store = useStore()
 const simpleList = ref([])
-if (store.isAdmin) {
-  get('/api/monitor/simple-list', list => {
-    simpleList.value = list
-  })
-}
 
 const warn = ref([])
 get('/api/warn/yesterday', data => {
   warn.value = data
+})
+
+const subTaskList = ref([])
+get('/api/task/getAllSubtask', data => {
+  subTaskList.value = data
 })
 
 
@@ -26,11 +27,14 @@ const getLocalhostRuntimeData = () => {
 }
 
 let intervalId = null;
+
+const onlineCount = ref();
 const fetchData = () => {
   getLocalhostRuntimeData();
   if (store.isAdmin) {
-    get('/api/monitor/simple-list', list => {
+    get('/api/monitor/list', list => {
       simpleList.value = list;
+      onlineCount.value = simpleList.value.filter(item => item.online === true).length;
     });
   }
 };
@@ -65,6 +69,13 @@ const sendMessage = () => {
   getAIResponse(newMessage.value);
   newMessage.value = '';
 };
+
+function formatDate(value) {
+  if (value) {
+    let date = new Date(value);
+    return date.getFullYear() + '-' + (date.getMonth() + 1).toString().padStart(2, '0') + '-' + date.getDate().toString().padStart(2, '0');
+  }
+}
 
 const getAIResponse = (input) => {
   const eventSource = new EventSource(`http://localhost:8080/chat/stream?input=${input}`);
@@ -105,36 +116,37 @@ const getAIResponse = (input) => {
       <div style="flex: 5;">
         <div class="server-info-card">
           <span class="title">此服务器运行指标:</span>
-          <div style="margin: 25px">
+          <div style="margin: 25px" v-if="localhostRuntimeData">
             <div class="metrics">
-              <div class="metric" v-if="localhostRuntimeData">
+              <div class="metric">
                 <span>CPU占用量: </span>
                 <span class="value">{{ localhostRuntimeData.cpuUsage.toFixed(2) }}%</span>
               </div>
-              <div class="metric" v-if="localhostRuntimeData">
+              <div class="metric">
                 <span>内存占用量: </span>
                 <span class="value">{{ localhostRuntimeData.memoryUsage.toFixed(2) }}%</span>
               </div>
             </div>
             <div class="metrics" style="margin-top: 10px">
-              <div class="metric" v-if="localhostRuntimeData">
+              <div class="metric">
                 <span>磁盘使用量: </span>
                 <span class="value">{{ localhostRuntimeData.diskUsage }}MB</span>
               </div>
-              <div class="metric" v-if="localhostRuntimeData">
+              <div class="metric">
                 <span>网络上行: </span>
                 <span class="value">{{ localhostRuntimeData.networkUpload.toFixed(2) }}KB/s</span>
               </div>
             </div>
           </div>
+          <div style="font-size: 20px;font-weight: bold;text-align: center;background-color: whitesmoke;margin: 30px;padding: 7px;border-radius: 20px;box-shadow: 0 0 5px 2px #d6d6d6" v-else
+          >该服务器上的客户端程序未打开哦</div>
         </div>
-        <div
-            style="height: calc((100% - 20px) / 2);background-color: #f5f4f1;border-radius: 20px;box-shadow: inset 0 0 3px #b9b8b8;margin-top: 20px">
+        <div style="height: calc((100% - 20px) / 2);background-color: #f5f4f1;border-radius: 20px;box-shadow: inset 0 0 3px #b9b8b8;margin-top: 20px">
           <span style="font-weight: bold;font-size: 30px;margin: 5px 10px">昨日服务器<span style="color: #c6bd1a;">告警</span>:</span>
           <span style="font-weight: bold;font-size: 27px;margin: 0 10px">{{warn.length}}</span>
           <div style="margin: 0 10px;height: calc((100% - 32px))">
             <el-scrollbar :style="{ 'max-height': 'calc(100% - 20px)' }">
-              <div class="warn-card" v-for="item in warn" style="position: relative">
+              <div class="warn-card" v-for="item in warn" style="position: relative" v-if="warn.length">
                 <div style="font-weight: bold">
                   {{item.clientName}}：
                 </div>
@@ -142,37 +154,85 @@ const getAIResponse = (input) => {
                   {{item.description}}-------- {{ item.time }}
                 </div>
               </div>
+
+              <div>
+                <div v-if="!warn.length" style="font-size: 17px;color: #747474;text-align: center;margin-top: 20px">
+                  昨日暂无告警哦，服务器运行良好
+                </div>
+              </div>
             </el-scrollbar>
           </div>
         </div>
       </div>
-      <div
-          style="flex: 8;background-color: #f5f4f1;margin-left: 20px;border-radius: 10px;box-shadow: inset 0 0 3px #b9b8b8;">
-        <span style="font-weight: bold;font-size: 30px;margin: 5px 10px">在线服务器列表</span>
-        <span style="font-weight: bold;font-size: 27px;margin: 0 10px">13 / 50</span>
-        <div style="display: flex;flex-wrap: wrap;gap: 10px">
-          <div style="margin: 0 10px">
-            <el-scrollbar max-height="350px">
-              <div style="display: flex; flex-wrap: wrap; overflow: auto">
-                <div class="overview-client-card" v-for="item in simpleList" style="width: 42%">
-                  <div style="margin-left: 20px">
-                    <div style="font-size: 14px;font-weight: bold">
-                      <span :class="`flag-icon flag-icon-${item.location}`"></span>
-                      <span style="margin: 0 10px">{{ item.name }}</span>
-                    </div>
-                    <div style="font-size: 12px;color: grey">
-                      操作系统:
-                      <i :style="{color: osNameToIcon(item.osName).color}"
-                         :class="`fa-brands ${osNameToIcon(item.osName).icon}`"></i>
-                      {{ `${item.osName} ${item.osVersion}` }}
-                    </div>
-                    <div style="font-size: 12px;color: grey">
-                      <span style="margin-right: 10px">公网IP: {{ item.ip }}</span>
+      <div style="flex: 8;background-color: #f5f4f1;margin-left: 20px;border-radius: 10px;box-shadow: inset 0 0 3px #b9b8b8;">
+        <div v-if="store.isAdmin">
+          <span style="font-weight: bold;font-size: 30px;margin: 5px 10px">在线服务器列表</span>
+          <span style="font-weight: bold;font-size: 27px;margin: 0 10px">{{onlineCount}} / {{simpleList.length}}</span>
+          <div style="display: flex;flex-wrap: wrap;gap: 10px">
+            <div style="margin: 0 10px">
+              <el-scrollbar max-height="350px">
+                <div style="display: flex; flex-wrap: wrap; overflow: auto">
+                  <div class="overview-client-card" v-for="item in simpleList" style="width: 42%" @click="router.push('/index/manage')">
+                    <div style="margin-left: 20px;width: 100%">
+                      <div style="font-size: 14px;font-weight: bold">
+                        <span :class="`flag-icon flag-icon-${item.location}`"></span>
+                        <span style="margin: 0 10px">{{ item.name }}</span>
+                        <span style="float: right">
+                          <el-tag :type="item.online ? 'success': 'warning'">{{item.online ? '在线':'离线'}}</el-tag>
+                        </span>
+                      </div>
+                      <div style="font-size: 12px;color: grey">
+                        操作系统:
+                        <i :style="{color: osNameToIcon(item.osName).color}"
+                           :class="`fa-brands ${osNameToIcon(item.osName).icon}`"></i>
+                        {{ `${item.osName} ${item.osVersion}` }}
+                      </div>
+                      <div style="font-size: 12px;color: grey">
+                        <span style="margin-right: 10px">公网IP: {{ item.ip }}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
+              </el-scrollbar>
+            </div>
+          </div>
+        </div>
+        <div v-else>
+          <div v-if="subTaskList.length">
+            <span style="font-weight: bold;font-size: 30px;margin: 5px 10px">任务列表</span>
+            <span style="font-weight: bold;font-size: 27px;margin: 0 10px">13 / 50</span>
+            <div style="display: flex;flex-wrap: wrap;gap: 10px">
+              <div style="margin: 0 10px">
+                <el-scrollbar max-height="350px">
+                  <div style="display: flex; flex-wrap: wrap; overflow: auto">
+                    <div @click="router.push('/index/devTask')" class="overview-client-card" v-for="item in subTaskList" style="width: 42%">
+                      <div>
+                        <div style="font-size: 18px;font-weight: bold">
+                          <span style="margin: 0 10px">{{ item.name }}</span>
+                        </div>
+                        <div style="font-size: 12px;color: grey">
+                          <span style="margin-right: 10px">任务描述: {{ item.description }}</span>
+                        </div>
+                        <div style="font-size: 12px;color: grey">
+                          <span style="margin-right: 10px">任务状态: {{ item.status === 2 ? '已完成': '未完成' }}</span>
+                        </div>
+                        <div style="font-size: 12px;color: grey">
+                          <span style="margin-right: 10px">任务开始时间: {{ formatDate(item.startTime) }}</span>
+                        </div>
+                        <div style="font-size: 12px;color: grey">
+                          <span style="margin-right: 10px">任务结束时间: {{ formatDate(item.endTime) }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </el-scrollbar>
               </div>
-            </el-scrollbar>
+            </div>
+          </div>
+          <div v-else>
+            <div style="font-size: 17px;color: #747474;text-align: center;margin-top: 20px">
+              目前没有任务分配给你哦~
+            </div>
           </div>
         </div>
       </div>
@@ -203,7 +263,7 @@ const getAIResponse = (input) => {
 .title {
   font-weight: bold;
   font-size: 30px;
-  margin-bottom: 10px;
+  margin: 5px 10px
 }
 
 .metrics {

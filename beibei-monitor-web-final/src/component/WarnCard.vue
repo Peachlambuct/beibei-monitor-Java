@@ -15,7 +15,7 @@ const registerTable = reactive({
   cpuWarn: 80,
   memoryWarn: 80,
 })
-defineProps({
+const prop = defineProps({
   warnRule: Object
 })
 
@@ -49,9 +49,6 @@ function updateRule() {
     <div style="margin-left: 20px">
       <span style="display: flex; justify-content: space-between; font-weight: bold; font-size: 20px">
         <span>{{ warnRule.clientName }}</span>
-        <span style="margin-left: 20px;font-size: 15px;font-weight: normal;color: #04c104">
-          <el-tag>在线</el-tag>
-        </span>
       </span>
       <div style="font-size: 15px;color: gray">
         <div>
@@ -60,11 +57,11 @@ function updateRule() {
             <i class="fa-solid fa-microchip"></i>: {{ warnRule.cpuWarn }}
           </div>
           <div>
-            Memory
+            内存
             <i class="fa-solid fa-memory"></i>：{{ warnRule.memoryWarn }}
           </div>
           <div>
-            desc: {{ warnRule.description }}
+            告警描述: {{ warnRule.description }}
           </div>
         </div>
       </div>
