@@ -132,8 +132,11 @@ public class MonitorController {
     public RestBean<String> deleteClient(int clientId,
                                          @RequestAttribute(Const.ATTR_USER_ROLE) String userRole) {
         if (this.isAdminAccount(userRole)) {
-            service.deleteClient(clientId);
-            return RestBean.success();
+            String res = service.deleteClient(clientId);
+            if (res == null)
+                return RestBean.success();
+            else
+                return RestBean.failure(400,res);
         } else {
             return RestBean.noPermission();
         }

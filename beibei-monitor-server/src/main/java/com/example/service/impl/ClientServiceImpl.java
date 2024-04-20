@@ -42,6 +42,9 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
     @Resource
     InfluxDbUtils influx;
 
+    @Resource
+    DevelopTaskMapper taskMapper;
+
     @PostConstruct
     public void initClientCache() {
         clientTokenCache.clear();
@@ -156,11 +159,16 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
     }
 
     @Override
-    public void deleteClient(int clientId) {
+    public String deleteClient(int clientId) {
+        List<SimpleTaskVO> tasks = taskMapper.selectTasksByClientId(String.valueOf(clientId));
+        if (tasks.size() > 0){
+            return "该客户端有任务，不允许删除";
+        }
         this.removeById(clientId);
         detailMapper.deleteById(clientId);
         this.initClientCache();
         currentRuntime.remove(clientId);
+        return null;
     }
 
     @Override

@@ -22,7 +22,7 @@ public interface ClientService extends IService<Client> {
     ClientDetailsVO clientDetails(int clientId);
     RuntimeHistoryVO clientRuntimeDetailsHistory(int clientId);
     RuntimeDetailVO clientRuntimeDetailsNow(int clientId);
-    void deleteClient(int clientId);
+    String deleteClient(int clientId);
     List<ClientNameVO> getClientNameList(Integer userId, String role);
     RuntimeDetailVO getCurrentClientDetails(String role);
 }

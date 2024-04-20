@@ -93,10 +93,14 @@ public class DevelopServiceImpl extends ServiceImpl<DevelopTaskMapper, DevelopTa
             // 计算进度
             int total = subtasks.size();
             int finished = 0;
-            for (DevelopSubtask subtask : subtasks) {
-                if (subtask.getStatus() == 2) finished++;
+            double process = -1;
+            if (total != 0){
+                for (DevelopSubtask subtask : subtasks) {
+                    if (subtask.getStatus() == 2) finished++;
+                }
+                process = finished * 1.0 / total;
             }
-            taskListVO.setProcess(finished * 1.0 / total);
+            taskListVO.setProcess(process);
             taskListVOS.add(taskListVO);
         }
         return taskListVOS;
