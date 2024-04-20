@@ -4,6 +4,7 @@ import {onUnmounted, ref} from "vue";
 import { get } from "@/net";
 import {useStore} from "@/store";
 import router from "@/router";
+import axios from "axios";
 
 const store = useStore()
 const simpleList = ref([])
@@ -76,9 +77,9 @@ function formatDate(value) {
     return date.getFullYear() + '-' + (date.getMonth() + 1).toString().padStart(2, '0') + '-' + date.getDate().toString().padStart(2, '0');
   }
 }
-
+const url = axios.defaults.baseURL
 const getAIResponse = (input) => {
-  const eventSource = new EventSource(`http://localhost:8080/chat/stream?input=${input}`);
+  const eventSource = new EventSource(`${url}/chat/stream?input=${input}`);
 
   eventSource.onmessage = (event) => {
     currentAIResponse.value.text += event.data;
@@ -168,7 +169,7 @@ const getAIResponse = (input) => {
         <div v-if="store.isAdmin">
           <span style="font-weight: bold;font-size: 30px;margin: 5px 10px">在线服务器列表</span>
           <span style="font-weight: bold;font-size: 27px;margin: 0 10px">{{onlineCount}} / {{simpleList.length}}</span>
-          <div style="display: flex;flex-wrap: wrap;gap: 10px">
+          <div style="flex-wrap: wrap;gap: 10px">
             <div style="margin: 0 10px">
               <el-scrollbar max-height="350px">
                 <div style="display: flex; flex-wrap: wrap; overflow: auto">
@@ -200,7 +201,6 @@ const getAIResponse = (input) => {
         <div v-else>
           <div v-if="subTaskList.length">
             <span style="font-weight: bold;font-size: 30px;margin: 5px 10px">任务列表</span>
-            <span style="font-weight: bold;font-size: 27px;margin: 0 10px">13 / 50</span>
             <div style="display: flex;flex-wrap: wrap;gap: 10px">
               <div style="margin: 0 10px">
                 <el-scrollbar max-height="350px">
@@ -245,7 +245,7 @@ const getAIResponse = (input) => {
           <div v-for="(message, index) in messages" :key="index" :class="message.sender" v-html="message.text">
           </div>
           <div>
-            <input v-model="newMessage" @keyup.enter="sendMessage" placeholder="Type your message here..." />
+            <input v-model="newMessage" @keyup.enter="sendMessage" placeholder="这里输入你想问的问题叭" />
           </div>
         </div>
       </div>

@@ -1,15 +1,9 @@
 <script setup>
 
-import {
-  Finished, Moon,
-  Setting, Sunny,
-  SwitchFilled,
-} from "@element-plus/icons-vue";
+import {Setting} from "@element-plus/icons-vue";
 import router from "@/router/index.js";
 import {logout} from "@/net/index.js";
 import {useStore} from "@/store";
-import {useDark} from "@vueuse/core";
-import {ref} from "vue";
 
 function userLogout() {
   logout(() => {
@@ -18,17 +12,12 @@ function userLogout() {
 }
 
 const store = useStore()
-const dark = ref(useDark())
 
 </script>
 
 <template>
   <el-container class="back_ground">
     <el-header style="background-color: #cccbc8;width: 100%" height="40px">
-      <el-switch style="margin: 0 20px;float: right"
-                 v-model="dark" active-color="#424242"
-                 :active-action-icon="Moon"
-                 :inactive-action-icon="Sunny"/>
     </el-header>
     <el-container class="center">
       <el-aside width="230">

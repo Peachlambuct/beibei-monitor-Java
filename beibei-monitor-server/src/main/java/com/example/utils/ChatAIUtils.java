@@ -34,7 +34,7 @@ public class ChatAIUtils {
                             .doOnNext(accumulator -> {
                                 try {
                                     if (isFirst.getAndSet(false)) {
-                                        emitter.send("贝贝: ");
+                                        emitter.send("回答: ");
                                     }
                                     if (accumulator.getDelta() != null && accumulator.getDelta().getTool_calls() != null) {
                                         String jsonString = mapper.writeValueAsString(accumulator.getDelta().getTool_calls());

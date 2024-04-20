@@ -54,7 +54,10 @@ function formatDate(value) {
         <div>任务状态：已完成</div>
         <div>任务相关服务器：Spark1</div>
         <div>任务进度：</div>
-        <el-progress :percentage="data.process * 100" status=""/>
+        <div v-if="data.process >= 0">
+          <el-progress :percentage="data.process * 100" status=""/>
+        </div>
+        <div v-else>暂未分配子任务</div>
       </div>
     </div>
 

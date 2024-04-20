@@ -72,6 +72,11 @@ const terminalWindow = ref()
 const closeConnect = () => {
   terminalWindow.value.closeTerminalConnection()
 }
+
+const deleteClient = () => {
+  updateList()
+  detail.show = false
+}
 </script>
 
 <template>
@@ -102,7 +107,7 @@ const closeConnect = () => {
     <el-empty description="还没有任何主机哦，点击右上角添加一个吧" v-else/>
     <el-drawer size="520" :show-close="false" v-model="detail.show"
                :with-header="false" v-if="list.length" @close="detail.id = -1">
-      <client-details :id="detail.id" :update="updateList" @delete="updateList" @terminal="openTerminal"/>
+      <client-details :id="detail.id" :update="updateList" @delete="deleteClient" @terminal="openTerminal"/>
     </el-drawer>
     <el-drawer v-model="register.show" direction="btt" :with-header="false"
                style="width: 600px;margin: 10px auto" size="320" @open="refreshToken">

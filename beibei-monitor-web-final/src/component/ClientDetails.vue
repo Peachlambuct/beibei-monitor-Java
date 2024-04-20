@@ -54,6 +54,7 @@ function getSSHList() {
   get(`/api/ssh/getSshByClient?clientId=${props.id}`, data => sshList.value = data)
 }
 getSSHList()
+
 function deleteClient() {
   ElMessageBox.confirm('删除此主机后所有统计数据都将丢失，您确定要这样做吗？', '删除主机', {
     confirmButtonText: '确定',
@@ -66,6 +67,7 @@ function deleteClient() {
       ElMessage.success('主机已成功移除')
     })
   }).catch(() => {})
+
 }
 
 function updateDetails() {
