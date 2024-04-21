@@ -33,9 +33,6 @@ public class ClientSshServiceImpl extends ServiceImpl<ClientSshMapper, ClientSsh
     @Resource
     ClientDetailMapper detailMapper;
 
-    private boolean isOnline(RuntimeDetailVO runtime) {
-        return runtime != null && System.currentTimeMillis() - runtime.getTimestamp() < 60 * 1000;
-    }
     @Override
     public List<SshListVO> getAlllist(Integer userId) {
         List<SshListVO> sshListVOS = this.baseMapper.getListByUserId(userId);
@@ -44,7 +41,7 @@ public class ClientSshServiceImpl extends ServiceImpl<ClientSshMapper, ClientSsh
             if (Objects.nonNull(clientServiceImpl.currentRuntime)){
                 RuntimeDetailVO runtimeDetailVO = clientServiceImpl.currentRuntime.get(sshListVO.getClientId());
                 if (runtimeDetailVO != null)
-                    sshListVO.setIsOnLine(isOnline(runtimeDetailVO));
+                    sshListVO.setIsOnLine(true);
             }
         }
         return sshListVOS;

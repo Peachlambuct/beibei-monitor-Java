@@ -125,7 +125,7 @@ const getAIResponse = (input) => {
               </div>
               <div class="metric">
                 <span>内存占用量: </span>
-                <span class="value">{{ localhostRuntimeData.memoryUsage.toFixed(2) }}%</span>
+                <span class="value">{{ localhostRuntimeData.memoryUsage.toFixed(2) }}G</span>
               </div>
             </div>
             <div class="metrics" style="margin-top: 10px">

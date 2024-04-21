@@ -48,7 +48,7 @@ function formatDate(value) {
     <div>
       <div class="desc" style="margin-left: 20px" @click="show = true">
         <div>任务描述：{{data.description}}</div>
-        <div>任务小组成员：{{data.principalName}}</div>
+        <div>任务小组成员：{{data.principalNames}}</div>
         <div>任务开始时间：{{formatDate(data.startTime)}}</div>
         <div>任务结束时间：{{formatDate(data.endTime)}}</div>
         <div>任务状态：{{data.status===0 ? '未完成' : '已完成'}}</div>
