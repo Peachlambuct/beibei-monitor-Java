@@ -57,15 +57,15 @@ public class ClientSshServiceImpl extends ServiceImpl<ClientSshMapper, ClientSsh
             BeanUtils.copyProperties(vo, clientSsh);
             clientSsh.setIp(ip);
             this.updateById(clientSsh);
-        } else {
+        }else {
             clientSsh = new ClientSsh();
-            BeanUtils.copyProperties(vo, clientSsh);
+            BeanUtils.copyProperties(vo,clientSsh);
             clientSsh.setIp(ip);
             clientSsh.setUserId(userId);
             this.save(clientSsh);
         }
         SshConnectionVO sshConnectionVO = new SshConnectionVO();
-        BeanUtils.copyProperties(clientSsh, sshConnectionVO);
+        BeanUtils.copyProperties(clientSsh,sshConnectionVO);
         return sshConnectionVO;
     }
 
