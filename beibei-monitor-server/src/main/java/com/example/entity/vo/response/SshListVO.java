@@ -9,7 +9,7 @@ public class SshListVO {
     Integer clientId;
     String clientName;
     String ip;
-    Boolean isOnLine;
+    Boolean isOnline;
     Integer port;
     String username;
     String password;

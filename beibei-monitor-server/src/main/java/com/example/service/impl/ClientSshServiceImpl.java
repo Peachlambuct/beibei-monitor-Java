@@ -33,19 +33,11 @@ public class ClientSshServiceImpl extends ServiceImpl<ClientSshMapper, ClientSsh
     @Resource
     ClientDetailMapper detailMapper;
 
-    private boolean isOnline(RuntimeDetailVO runtime) {
-        return runtime != null && System.currentTimeMillis() - runtime.getTimestamp() < 60 * 1000;
-    }
     @Override
     public List<SshListVO> getAlllist(Integer userId) {
         List<SshListVO> sshListVOS = this.baseMapper.getListByUserId(userId);
-        for (SshListVO sshListVO : sshListVOS){
-            sshListVO.setIsOnLine(false);
-            if (Objects.nonNull(clientServiceImpl.currentRuntime)){
-                RuntimeDetailVO runtimeDetailVO = clientServiceImpl.currentRuntime.get(sshListVO.getClientId());
-                if (runtimeDetailVO != null)
-                    sshListVO.setIsOnLine(isOnline(runtimeDetailVO));
-            }
+        for (SshListVO sshListVO : sshListVOS) {
+            sshListVO.setIsOnline(clientServiceImpl.getCurrentClientRunStatus(sshListVO.getClientId()));
         }
         return sshListVOS;
     }
@@ -65,19 +57,18 @@ public class ClientSshServiceImpl extends ServiceImpl<ClientSshMapper, ClientSsh
             BeanUtils.copyProperties(vo, clientSsh);
             clientSsh.setIp(ip);
             this.updateById(clientSsh);
-        }else {
+        } else {
             clientSsh = new ClientSsh();
-            BeanUtils.copyProperties(vo,clientSsh);
+            BeanUtils.copyProperties(vo, clientSsh);
             clientSsh.setIp(ip);
             clientSsh.setUserId(userId);
             this.save(clientSsh);
         }
         SshConnectionVO sshConnectionVO = new SshConnectionVO();
-        BeanUtils.copyProperties(clientSsh,sshConnectionVO);
+        BeanUtils.copyProperties(clientSsh, sshConnectionVO);
         return sshConnectionVO;
     }
 
-    //TODO 不知道干嘛用的
     @Override
     public SshSettingsVO sshSettings(Integer clientId) {
         ClientDetail detail = detailMapper.selectById(clientId);
@@ -103,8 +94,8 @@ public class ClientSshServiceImpl extends ServiceImpl<ClientSshMapper, ClientSsh
 
     @Override
     public String deleteClientSsh(Integer id, Integer userId, String role) {
-        if (!Const.ROLE_ADMIN.equals(role.substring(5))){
-            if (!this.getById(id).getUserId().equals(userId)){
+        if (!Const.ROLE_ADMIN.equals(role.substring(5))) {
+            if (!this.getById(id).getUserId().equals(userId)) {
                 return "权限不足";
             }
         }
@@ -112,7 +103,7 @@ public class ClientSshServiceImpl extends ServiceImpl<ClientSshMapper, ClientSsh
     }
 
     @Override
-    public List<SshConnectionVO> getSshByClient(Integer clientId,Integer userId) {
+    public List<SshConnectionVO> getSshByClient(Integer clientId, Integer userId) {
         List<ClientSsh> clientSshes = this.baseMapper.selectList(new QueryWrapper<ClientSsh>()
                 .eq("client_id", clientId)
                 .eq("user_id", userId));
@@ -121,7 +112,7 @@ public class ClientSshServiceImpl extends ServiceImpl<ClientSshMapper, ClientSsh
         return clientSshVOS;
     }
 
-    private  String testSsh(SshTestVO ssh) {
+    private String testSsh(SshTestVO ssh) {
         try {
             JSch jSch = new JSch();
             com.jcraft.jsch.Session js = jSch.getSession(ssh.getUsername(), ssh.getIp(), ssh.getPort());

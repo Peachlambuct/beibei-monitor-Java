@@ -57,6 +57,8 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
     @Resource
     ClientSshMapper clientSshMapper;
 
+    public final Map<Integer, RuntimeDetailVO> currentRuntime = new ConcurrentHashMap<>();
+
     @PostConstruct
     public void initClientCache() {
         try {
@@ -112,8 +114,6 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
             detailMapper.insert(detail);
         }
     }
-
-    public final Map<Integer, RuntimeDetailVO> currentRuntime = new ConcurrentHashMap<>();
 
     @Override
     public void updateRuntimeDetail(RuntimeDetailVO vo, Client client) {
@@ -219,7 +219,14 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
         Integer clientId = detailMapper.getIdByIp(currentIp);
         if (clientId == null)
             return null;
-        return clientRuntimeDetailsNow(clientId);
+        if (isOnline(currentRuntime.get(clientId))) {
+            return clientRuntimeDetailsNow(clientId);
+        }
+        return null;
+    }
+
+    public boolean getCurrentClientRunStatus(Integer clientId) {
+        return isOnline(currentRuntime.get(clientId));
     }
 
     private boolean isOnline(RuntimeDetailVO runtime) {
