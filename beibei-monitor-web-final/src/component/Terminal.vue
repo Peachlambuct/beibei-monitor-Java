@@ -4,6 +4,7 @@ import {ElMessage} from "element-plus";
 import {AttachAddon} from "xterm-addon-attach/src/AttachAddon";
 import {Terminal} from "xterm";
 import "xterm/css/xterm.css";
+import axios from "axios";
 
 const props = defineProps({
   id: Number
@@ -11,8 +12,8 @@ const props = defineProps({
 const emits = defineEmits(['dispose'])
 
 const terminalRef = ref()
-
-const socket = new WebSocket(`ws://127.0.0.1:8080/terminal/${props.id}`)
+const url = axios.defaults.baseURL.replace('http', 'ws');
+const socket = new WebSocket(`${url}/terminal/${props.id}`)
 socket.onclose = evt => {
   if(evt.code !== 1000) {
     ElMessage.warning(`连接失败: ${evt.reason}`)

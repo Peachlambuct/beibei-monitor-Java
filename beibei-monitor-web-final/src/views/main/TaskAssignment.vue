@@ -73,8 +73,10 @@ function addTask() {
       aboutClientId: [],
       subtasks: []
     }
+  },(e) => {
+    ElMessage.error(e)
+    getTaskList()
   })
-  console.log(mainTask.value)
   show.value = false
 }
 
@@ -85,8 +87,6 @@ function removeSubTask(index) {
 function updateTask(data) {
   mainTask.value = data
   mainTask.value.aboutClientId = data.aboutClientIds
-  console.info("data：" + data)
-  console.info(mainTask.value)
   show.value = true
 }
 
@@ -193,9 +193,10 @@ function updateTask(data) {
       </div>
     </el-dialog>
 
-    <div style="display: flex; flex-direction: row; flex-wrap: wrap;">
+    <div style="display: flex; flex-direction: row; flex-wrap: wrap;" v-if="taskList.length">
       <TaskCard @update-task="updateTask" @delete-task="getTaskList" v-for="item in taskList" :data="item"/>
     </div>
+    <el-empty description="还没有任何任务哦" v-else/>
   </div>
 </template>
 

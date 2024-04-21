@@ -1,6 +1,6 @@
 <script setup>
 
-import {Delete} from "@element-plus/icons-vue";
+import {Delete, Edit} from "@element-plus/icons-vue";
 import {ref} from "vue";
 import {get} from "@/net";
 import {ElMessage} from "element-plus";
@@ -36,7 +36,7 @@ function formatDate(value) {
         <div style="font-weight: bold;font-size: 20px">{{data.name}}</div>
       </div>
       <div class="button-container">
-        <el-button style="float: right;margin-right: 10px" :icon="Delete" color="#5c5c5c"
+        <el-button style="float: right;margin-right: 10px" :icon="Edit" color="#5c5c5c"
                    @click="$emit('updateTask',data)">修改
         </el-button>
         <el-button style="float: right;margin-right: 10px" :icon="Delete" color="#5c5c5c"
@@ -83,6 +83,7 @@ function formatDate(value) {
         <div v-if="data.subtasks.length > 0">
           <div style="font-size: 18px;color: gray;margin-top: 10px">子任务列表</div>
           <ul style="font-size: 14px;margin-top: 10px" v-for="item in data.subtasks">
+            <li>项目名称：{{item.name}}</li>
             <li>项目描述：{{item.description}}</li>
             <li>项目开始时间：{{formatDate(item.startTime)}}</li>
             <li>项目结束时间：{{formatDate(item.startTime)}}</li>

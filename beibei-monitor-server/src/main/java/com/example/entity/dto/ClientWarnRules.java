@@ -13,6 +13,7 @@ public class ClientWarnRules implements BaseData {
     @TableId(type = IdType.AUTO)
     Integer id; //规则id
     Integer clientId;   //客户端id
+    Integer userId;   //用户id
     String name; // 规则名称
     Double cpuWarn; //cpu告警阈值
     Double memoryWarn;  //内存告警阈值

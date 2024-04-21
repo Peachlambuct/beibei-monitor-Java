@@ -152,9 +152,10 @@ watch(checkedNodes, getList);
       </el-checkbox-group>
     </div>
 
-    <div style="display: flex; flex-direction: row; flex-wrap: wrap;">
+    <div style="display: flex; flex-direction: row; flex-wrap: wrap;" v-if="sshList.length">
       <SSHDetailCard v-for="item in sshList" :data="item" @flash="getList" @update="updateSSH"/>
     </div>
+    <el-empty description="还没有任何SSH连接哦，点击右上角添加一个吧" v-else/>
   </div>
 </template>
 

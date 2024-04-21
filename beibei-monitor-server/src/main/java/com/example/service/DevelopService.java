@@ -25,5 +25,5 @@ public interface DevelopService extends IService<DevelopTask> {
 
     List<SimpleTaskVO> getTaskByClientId(Integer clientId);
 
-    void saveTask(TaskSaveVO task, String role);
+    String saveTask(TaskSaveVO task, String role);
 }

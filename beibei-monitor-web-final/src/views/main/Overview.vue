@@ -201,10 +201,10 @@ const getAIResponse = (input) => {
         <div v-else>
           <div v-if="subTaskList.length">
             <span style="font-weight: bold;font-size: 30px;margin: 5px 10px">任务列表</span>
-            <div style="display: flex;flex-wrap: wrap;gap: 10px">
+            <div style="flex-wrap: wrap;gap: 10px">
               <div style="margin: 0 10px">
                 <el-scrollbar max-height="350px">
-                  <div style="display: flex; flex-wrap: wrap; overflow: auto">
+                  <div style="flex-wrap: wrap; overflow: auto">
                     <div @click="router.push('/index/devTask')" class="overview-client-card" v-for="item in subTaskList" style="width: 42%">
                       <div>
                         <div style="font-size: 18px;font-weight: bold">

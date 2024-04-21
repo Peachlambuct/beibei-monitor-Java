@@ -1,6 +1,7 @@
 package com.example.service.impl;
 
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.entity.dto.*;
@@ -17,7 +18,13 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.InetAddress;
+import java.net.URL;
+import java.net.UnknownHostException;
 import java.security.SecureRandom;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,7 +32,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> implements ClientService {
 
-    @Value("${spring.monitor.current-client-ip}")
     private String currentIp;
 
     private String registerToken = this.generateNewToken();
@@ -45,8 +51,22 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
     @Resource
     DevelopTaskMapper taskMapper;
 
+    @Resource
+    ClientWarnRulesMapper clientWarnRulesMapper;
+
+    @Resource
+    ClientSshMapper clientSshMapper;
+
     @PostConstruct
     public void initClientCache() {
+        try {
+            URL url = new URL("http://checkip.amazonaws.com");
+            BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()));
+            currentIp = br.readLine();
+            System.out.println("获取的公网IP" + currentIp);
+        } catch (Exception e) {
+            log.error("获取IP地址失败");
+        }
         clientTokenCache.clear();
         clientIdCache.clear();
         this.list().forEach(this::addClientCache);
@@ -159,13 +179,23 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
     }
 
     @Override
+    @Transactional
     public String deleteClient(int clientId) {
         List<SimpleTaskVO> tasks = taskMapper.selectTasksByClientId(String.valueOf(clientId));
-        if (tasks.size() > 0){
+        if (!tasks.isEmpty()) {
             return "该客户端有任务，不允许删除";
         }
         this.removeById(clientId);
         detailMapper.deleteById(clientId);
+        clientSshMapper.delete(Wrappers.<ClientSsh>query().eq("client_id", clientId));
+        clientWarnRulesMapper.delete(Wrappers.<ClientWarnRules>query().eq("client_id", clientId));
+        detailMapper.deleteById(clientId);
+        List<Account> accountList = accountMapper.getByClientId(String.valueOf(clientId));
+        accountList.forEach(account -> {
+            List<Integer> list = account.getClientList().stream().filter(it -> !it.equals(clientId)).toList();
+            account.setClients(JSON.toJSONString(list));
+            accountMapper.updateById(account);
+        });
         this.initClientCache();
         currentRuntime.remove(clientId);
         return null;
@@ -174,7 +204,7 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
     @Override
     public List<ClientNameVO> getClientNameList(Integer userId, String role) {
         List<ClientNameVO> clientNameVOS = baseMapper.getByClientName();
-        if (!Const.ROLE_ADMIN.equals(role.substring(5))){
+        if (!Const.ROLE_ADMIN.equals(role.substring(5))) {
             String clients = accountMapper.selectById(userId).getClients();
             clientNameVOS = clientNameVOS.stream().filter(vo
                     -> JSON.parseArray(clients, Integer.class).contains(vo.getClientId())).toList();

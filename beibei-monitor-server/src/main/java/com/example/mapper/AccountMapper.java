@@ -12,4 +12,7 @@ public interface AccountMapper extends BaseMapper<Account> {
 
     @Select("select clients from db_account where id = #{userId}")
     String getClientsById(Integer userId);
+
+    @Select("SELECT * FROM db_account WHERE JSON_CONTAINS(clients, #{clientId})")
+    List<Account> getByClientId(String clientId);
 }

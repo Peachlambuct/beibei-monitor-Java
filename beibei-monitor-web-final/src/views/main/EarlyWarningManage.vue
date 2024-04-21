@@ -120,9 +120,10 @@ onMounted(() => {
       </div>
     </el-dialog>
 
-    <div style="display: flex; flex-direction: row; flex-wrap: wrap;">
+    <div style="display: flex; flex-direction: row; flex-wrap: wrap;" v-if="warnList.length">
       <WarnCard v-for="item in warnList" :warn-rule="item" @update-warn-rule="getWarnList"/>
     </div>
+    <el-empty description="还没有任何预警规则哦，点击右上角添加一个吧" v-else/>
   </div>
 </template>
 

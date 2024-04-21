@@ -43,7 +43,10 @@ public class TaskController {
     @PostMapping("/saveTask")
     public RestBean<Void> saveTask(@RequestAttribute(Const.ATTR_USER_ROLE)String role,
                                    @RequestBody TaskSaveVO task){
-        developService.saveTask(task,role);
+        String res = developService.saveTask(task, role);
+        if (res != null){
+            return RestBean.failure(400,res);
+        }
         return RestBean.success();
     }
 

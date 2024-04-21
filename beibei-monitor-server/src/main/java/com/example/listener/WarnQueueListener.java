@@ -1,6 +1,7 @@
 package com.example.listener;
 
 
+import com.example.handler.EmailErrorHandler;
 import jakarta.annotation.Resource;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -12,7 +13,7 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 
 @Component
-@RabbitListener(queues = "warn")
+@RabbitListener(queues = "warn",errorHandler = "emailErrorHandler")
 public class WarnQueueListener {
 
     @Resource
@@ -20,6 +21,9 @@ public class WarnQueueListener {
 
     @Value("${spring.mail.username}")
     String username;
+
+    @Resource
+    private EmailErrorHandler emailErrorHandler;
 
     /**
      * 处理告警信息

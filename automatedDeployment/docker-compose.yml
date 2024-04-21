@@ -9,6 +9,7 @@ services:
       - influxdb
       - redis
       - rabbitmq
+      - mysql
     restart: always
     environment:
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/monitor
@@ -55,12 +56,12 @@ services:
     container_name: monitor_mysql
     build: ./mysql
     ports:
-      - "3306:3306"                             #将外部端口33307映射为内部默认创建的3306
+      - "3306:3306"
     environment:
       MYSQL_ROOT_HOST: '%'
-      MYSQL_ROOT_PASSWORD: 123456                #数据库初始话为root用户设置的默认密码
-      MYSQL_DATABASE: monitor                 #数据库名
-    restart: on-failure                          #重启条件
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: monitor
+    restart: on-failure
 
 volumes:
   influxdb-data:

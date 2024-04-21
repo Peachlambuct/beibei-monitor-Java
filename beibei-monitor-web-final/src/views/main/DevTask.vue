@@ -35,9 +35,10 @@ getList()
       </div>
       <el-divider style="margin: 10px 0"/>
 
-      <div style="display: flex; flex-direction: row; flex-wrap: wrap;">
+      <div style="display: flex; flex-direction: row; flex-wrap: wrap;" v-if="taskList.length">
         <DevTaskCard v-for="item in taskList" :data="item" @flash="getList"/>
       </div>
+      <el-empty description="还没有任何任务哦" v-else/>
     </div>
   </div>
 </template>

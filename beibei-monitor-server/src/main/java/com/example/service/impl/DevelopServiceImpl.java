@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.example.entity.RestBean;
 import com.example.entity.dto.Account;
 import com.example.entity.dto.Client;
 import com.example.entity.dto.DevelopSubtask;
@@ -115,15 +116,27 @@ public class DevelopServiceImpl extends ServiceImpl<DevelopTaskMapper, DevelopTa
 
     @Override
     @Transactional
-    public void saveTask(TaskSaveVO task, String role) {
+    public String saveTask(TaskSaveVO task, String role) {
         if (!Const.ROLE_ADMIN.equals(role.substring(5)))
-            return;
+            return "权限不足";
+        if (task.getStartTime().after(task.getEndTime())){
+            return "开始时间不能小于当前时间";
+        }
         DevelopTask developTask = new DevelopTask(null, task.getName(),
                 JSONArray.copyOf(task.getPrincipalIds()).toJSONString(),
                 task.getType(), task.getDescription(),
                 JSONArray.copyOf(task.getAboutClientId()).toJSONString(), task.getStartTime(),
                 task.getEndTime(), null);
         List<SubtaskSaveVO> subtasks = task.getSubtasks();
+        for (SubtaskSaveVO subtask : subtasks) {
+            if (subtask.getStartTime().after(subtask.getEndTime())){
+                return "开始时间不能小于当前时间";
+            }else if (subtask.getStartTime().before(developTask.getStartTime())) {
+                return "子任务开始时间不能小于主任务开始时间";
+            }else if (subtask.getEndTime().after(developTask.getEndTime())) {
+                return "子任务结束时间不能大于主任务结束时间";
+            }
+        }
         if (task.getId() != null) {
             developTask.setId(task.getId());
             this.updateById(developTask);
@@ -136,7 +149,7 @@ public class DevelopServiceImpl extends ServiceImpl<DevelopTaskMapper, DevelopTa
             DevelopSubtask subtask = new DevelopSubtask();
             BeanUtils.copyProperties(subtaskVo, subtask);
             subtaskList.removeIf(subtask1 -> subtask1.getId().equals(subtask.getId()));
-            subtask.setTaskId(task.getId());
+            subtask.setTaskId(developTask.getId());
             if (subtask.getId() != null) {
                 subtaskMapper.updateById(subtask);
             } else {
@@ -144,6 +157,7 @@ public class DevelopServiceImpl extends ServiceImpl<DevelopTaskMapper, DevelopTa
             }
         }
         subtaskList.forEach(subtask -> subtaskMapper.deleteById(subtask.getId()));
+        return null;
     }
 
     @Override

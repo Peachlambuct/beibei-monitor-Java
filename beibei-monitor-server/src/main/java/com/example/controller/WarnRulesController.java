@@ -19,8 +19,9 @@ public class WarnRulesController {
     ClientWarnRulesService clientWarnRulesService;
 
     @PostMapping("/addWarnRule")
-    public RestBean<String> addWarnRule(@RequestBody ClientWarnRules warnRule) {
-        String res = clientWarnRulesService.addWarnRule(warnRule);
+    public RestBean<String> addWarnRule(@RequestBody ClientWarnRules warnRule,
+                                        @RequestAttribute(Const.ATTR_USER_ID) Integer userId) {
+        String res = clientWarnRulesService.addWarnRule(warnRule,userId);
         if ("添加成功".equals(res)){
             return RestBean.success(res);
         }else {
@@ -41,8 +42,7 @@ public class WarnRulesController {
     }
 
     @GetMapping("/list")
-    public RestBean<List<ClientWarnRulesVO>> listAllWarnRules(@RequestAttribute(Const.ATTR_USER_ID) Integer userId,
-                                                              @RequestAttribute(Const.ATTR_USER_ROLE) String role) {
-        return RestBean.success(clientWarnRulesService.listAllWarnRules(userId,role));
+    public RestBean<List<ClientWarnRulesVO>> listAllWarnRules(@RequestAttribute(Const.ATTR_USER_ID) Integer userId) {
+        return RestBean.success(clientWarnRulesService.listAllWarnRules(userId));
     }
 }

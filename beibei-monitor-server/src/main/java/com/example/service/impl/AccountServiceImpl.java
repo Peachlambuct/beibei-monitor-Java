@@ -1,15 +1,22 @@
 package com.example.service.impl;
 
 import com.alibaba.fastjson2.JSONArray;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.entity.dto.Account;
+import com.example.entity.dto.ClientSsh;
+import com.example.entity.dto.ClientWarnRules;
+import com.example.entity.dto.DevelopTask;
 import com.example.entity.vo.request.ConfirmResetVO;
 import com.example.entity.vo.request.CreateSubAccountVO;
 import com.example.entity.vo.request.EmailResetVO;
 import com.example.entity.vo.request.ModifyEmailVO;
 import com.example.entity.vo.response.SubAccountVO;
 import com.example.mapper.AccountMapper;
+import com.example.mapper.ClientSshMapper;
+import com.example.mapper.ClientWarnRulesMapper;
+import com.example.mapper.DevelopTaskMapper;
 import com.example.service.AccountService;
 import com.example.utils.Const;
 import com.example.utils.FlowUtils;
@@ -22,6 +29,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -44,6 +52,15 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
 
     @Resource
     PasswordEncoder passwordEncoder;
+
+    @Resource
+    ClientWarnRulesMapper clientWarnRulesMapper;
+
+    @Resource
+    ClientSshMapper clientSshMapper;
+
+    @Resource
+    DevelopTaskMapper developTaskMapper;
 
     @Resource
     FlowUtils flow;
@@ -148,9 +165,16 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
     }
 
     @Override
+    @Transactional
     public void deleteSubAccount(int uid) {
+        clientWarnRulesMapper.delete(new QueryWrapper<ClientWarnRules>().eq("user_id", uid));
+        clientSshMapper.delete(new QueryWrapper<ClientSsh>().eq("user_id", uid));
+        List<DevelopTask> developTasks = developTaskMapper.getAllByUserId(uid);
+        developTasks.forEach(developTask -> {
+            JSONArray.parseArray(developTask.getPrincipalIds()).removeIf(o -> o.equals(uid));
+            developTaskMapper.updateById(developTask);
+        });
         this.removeById(uid);
-
     }
 
     @Override

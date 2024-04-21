@@ -12,6 +12,7 @@ import com.example.service.ClientWarnRulesService;
 import com.example.utils.Const;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestAttribute;
 
 import java.util.List;
 
@@ -25,10 +26,11 @@ public class ClientWarnRulesServiceImpl extends ServiceImpl<ClientWarnRulesMappe
     AccountMapper accountMapper;
 
     @Override
-    public String addWarnRule(ClientWarnRules warnRule) {
-        if (this.baseMapper.selectList(
-                new QueryWrapper<ClientWarnRules>().eq("client_id",warnRule.getClientId())).size() > 0)
+    public String addWarnRule(ClientWarnRules warnRule,Integer userId){
+        if (this.getOne(new QueryWrapper<ClientWarnRules>().eq("client_id",warnRule.getClientId())
+                .eq("user_id",userId))!=null)
             return "该客户端规则已存在";
+        warnRule.setUserId(userId);
         this.save(warnRule);
         return "添加成功";
     }
@@ -49,12 +51,7 @@ public class ClientWarnRulesServiceImpl extends ServiceImpl<ClientWarnRulesMappe
     }
 
     @Override
-    public List<ClientWarnRulesVO> listAllWarnRules(Integer userId,String role) {
-        List<ClientWarnRulesVO> clientWarnRulesVOS = clientWarnRulesMapper.getAllList();
-        if (!Const.ROLE_ADMIN.equals(role.substring(5))){
-            List<Integer> clientIds = JSON.parseArray(accountMapper.getClientsById(userId), Integer.class);
-            clientWarnRulesVOS.removeIf(clientWarnRulesVO -> !clientIds.contains(clientWarnRulesVO.getClientId()));
-        }
-        return clientWarnRulesVOS;
+    public List<ClientWarnRulesVO> listAllWarnRules(Integer userId) {
+        return clientWarnRulesMapper.getAllList(userId);
     }
 }
