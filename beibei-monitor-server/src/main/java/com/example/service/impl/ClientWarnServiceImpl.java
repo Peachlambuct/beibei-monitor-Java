@@ -98,7 +98,6 @@ public class ClientWarnServiceImpl extends ServiceImpl<ClientWarnMapper, ClientW
         warn.setDetail(JSON.toJSONString(warnVO.getWarnProcessInfos()));
         this.save(warn);
 
-        // 这里应该是发送到rabbitmq
         // 根据clientId获取负责节点人的email
         if (stringRedisTemplate.opsForValue().get(Const.MQ_WARN + clientId) != null) return;
         clientMapper.findEmailsByClientId(clientId).forEach(email -> {
@@ -108,13 +107,6 @@ public class ClientWarnServiceImpl extends ServiceImpl<ClientWarnMapper, ClientW
                     "description", description);
             rabbitTemplate.convertAndSend(Const.MQ_WARN, data);
         });
-
-        //TODO 测试用
-        Map<String, Object> data = Map.of("id",clientId,
-                "data", warnVO.getWarnProcessInfos(),
-                "email", "2727402548@qq.com",
-                "description", description);
-        rabbitTemplate.convertAndSend(Const.MQ_WARN, data);
 
         //放入redis防止10分钟内重复发送
         stringRedisTemplate.opsForValue().set(Const.MQ_WARN + clientId, "1", 10, TimeUnit.MINUTES);
