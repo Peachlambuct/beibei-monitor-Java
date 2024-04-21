@@ -51,8 +51,8 @@ function formatDate(value) {
         <div>任务小组成员：{{data.principalName}}</div>
         <div>任务开始时间：{{formatDate(data.startTime)}}</div>
         <div>任务结束时间：{{formatDate(data.endTime)}}</div>
-        <div>任务状态：已完成</div>
-        <div>任务相关服务器：Spark1</div>
+        <div>任务状态：{{data.status===0 ? '未完成' : '已完成'}}</div>
+        <div>任务相关服务器：{{data.aboutClientNames ? data.aboutClientNames : "未指定服务器"}}</div>
         <div>任务进度：</div>
         <div v-if="data.process >= 0">
           <el-progress :percentage="data.process * 100" status=""/>
