@@ -29,7 +29,7 @@ function clearTable() {
 const warnList = ref([])
 function getWarnList() {
   get('/api/warnRules/list', list => {
-    warnList.value.push(...list)
+    warnList.value = list
   })
 }
 

@@ -34,7 +34,7 @@ defineProps({
   .sub-title {
     font-size: 16px;
     font-weight: bold;
-    color: dodgerblue;
+    color: #8aadd6;
   }
 
   .desc {

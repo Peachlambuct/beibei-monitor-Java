@@ -70,8 +70,6 @@ const props = defineProps({
 </template>
 
 <style scoped>
-.dark .instance-card { color: #d9d9d9 }
-
 .interact-item {
   transition: .3s;
 
@@ -85,7 +83,7 @@ const props = defineProps({
 .instance-card {
   width: 320px;
   padding: 15px;
-  background-color: #f5f4f1;
+  background-color: rgba(245, 245, 233, 0.88);
   border-radius: 5px;
   box-sizing: border-box;
   color: #606060;

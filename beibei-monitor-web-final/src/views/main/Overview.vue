@@ -1,7 +1,7 @@
 <script setup>
 import {osNameToIcon} from "@/tools";
 import {onUnmounted, ref} from "vue";
-import { get } from "@/net";
+import {get} from "@/net";
 import {useStore} from "@/store";
 import router from "@/router";
 import axios from "axios";
@@ -77,6 +77,7 @@ function formatDate(value) {
     return date.getFullYear() + '-' + (date.getMonth() + 1).toString().padStart(2, '0') + '-' + date.getDate().toString().padStart(2, '0');
   }
 }
+
 const url = axios.defaults.baseURL
 const getAIResponse = (input) => {
   const eventSource = new EventSource(`${url}/chat/stream?input=${input}`);
@@ -115,6 +116,7 @@ const getAIResponse = (input) => {
 
     <div style="width: 100%;height: 400px;display: flex">
       <div style="flex: 5;">
+
         <div class="server-info-card">
           <span class="title">此服务器运行指标:</span>
           <div style="margin: 25px" v-if="localhostRuntimeData">
@@ -139,20 +141,23 @@ const getAIResponse = (input) => {
               </div>
             </div>
           </div>
-          <div style="font-size: 20px;font-weight: bold;text-align: center;background-color: whitesmoke;margin: 30px;padding: 7px;border-radius: 20px;box-shadow: 0 0 5px 2px #d6d6d6" v-else
-          >该服务器上的客户端程序未打开哦</div>
+          <div
+              style="font-size: 20px;font-weight: bold;text-align: center;background-color: whitesmoke;margin: 30px;padding: 7px;border-radius: 20px;box-shadow: 0 0 5px 2px #d6d6d6"
+              v-else
+          >该服务器上的客户端程序未打开哦
+          </div>
         </div>
-        <div style="height: calc((100% - 20px) / 2);background-color: #f5f4f1;border-radius: 20px;box-shadow: inset 0 0 3px #b9b8b8;margin-top: 20px">
-          <span style="font-weight: bold;font-size: 30px;margin: 5px 10px">昨日服务器<span style="color: #c6bd1a;">告警</span>:</span>
-          <span style="font-weight: bold;font-size: 27px;margin: 0 10px">{{warn.length}}</span>
+        <div class="warn-info-card">
+          <span style="font-weight: bold;font-size: 30px;margin: 5px 10px">昨日服务器告警:</span>
+          <span style="font-weight: bold;font-size: 27px;margin: 0 10px">{{ warn.length }}</span>
           <div style="margin: 0 10px;height: calc((100% - 32px))">
             <el-scrollbar :style="{ 'max-height': 'calc(100% - 20px)' }">
               <div class="warn-card" v-for="item in warn" style="position: relative" v-if="warn.length">
                 <div style="font-weight: bold">
-                  {{item.clientName}}：
+                  {{ item.clientName }}：
                 </div>
                 <div style="font-size: 15px;color: #747474">
-                  {{item.description}}-------- {{ item.time }}
+                  {{ item.description }}-------- {{ item.time }}
                 </div>
               </div>
 
@@ -165,21 +170,25 @@ const getAIResponse = (input) => {
           </div>
         </div>
       </div>
-      <div style="flex: 8;background-color: #f5f4f1;margin-left: 20px;border-radius: 10px;box-shadow: inset 0 0 3px #b9b8b8;">
+      <div
+          style="flex: 8;background-image: linear-gradient(to right, #e0ffcc, #e7e8c4);margin-left: 20px;border-radius: 10px;box-shadow: inset 0 0 3px #b9b8b8;">
         <div v-if="store.isAdmin">
           <span style="font-weight: bold;font-size: 30px;margin: 5px 10px">在线服务器列表</span>
-          <span style="font-weight: bold;font-size: 27px;margin: 0 10px">{{onlineCount}} / {{simpleList.length}}</span>
+          <span
+              style="font-weight: bold;font-size: 27px;margin: 0 10px">{{ onlineCount }} / {{ simpleList.length }}</span>
           <div style="flex-wrap: wrap;gap: 10px">
             <div style="margin: 0 10px">
               <el-scrollbar max-height="350px">
                 <div style="display: flex; flex-wrap: wrap; overflow: auto">
-                  <div class="overview-client-card" v-for="item in simpleList" style="width: 42%" @click="router.push('/index/manage')">
+                  <div class="overview-client-card" v-for="item in simpleList" style="width: 42%"
+                       @click="router.push('/index/manage')">
                     <div style="margin-left: 20px;width: 100%">
                       <div style="font-size: 14px;font-weight: bold">
                         <span :class="`flag-icon flag-icon-${item.location}`"></span>
                         <span style="margin: 0 10px">{{ item.name }}</span>
                         <span style="float: right">
-                          <el-tag :type="item.online ? 'success': 'warning'">{{item.online ? '在线':'离线'}}</el-tag>
+                          <el-tag
+                              :type="item.online ? 'success': 'warning'">{{ item.online ? '在线' : '离线' }}</el-tag>
                         </span>
                       </div>
                       <div style="font-size: 12px;color: grey">
@@ -205,7 +214,8 @@ const getAIResponse = (input) => {
               <div style="margin: 0 10px">
                 <el-scrollbar max-height="350px">
                   <div style="flex-wrap: wrap; overflow: auto">
-                    <div @click="router.push('/index/devTask')" class="overview-client-card" v-for="item in subTaskList" style="width: 42%">
+                    <div @click="router.push('/index/devTask')" class="overview-client-card" v-for="item in subTaskList"
+                         style="width: 42%">
                       <div>
                         <div style="font-size: 18px;font-weight: bold">
                           <span style="margin: 0 10px">{{ item.name }}</span>
@@ -214,7 +224,9 @@ const getAIResponse = (input) => {
                           <span style="margin-right: 10px">任务描述: {{ item.description }}</span>
                         </div>
                         <div style="font-size: 12px;color: grey">
-                          <span style="margin-right: 10px">任务状态: {{ item.status === 2 ? '已完成': '未完成' }}</span>
+                          <span style="margin-right: 10px">任务状态: {{
+                              item.status === 2 ? '已完成' : '未完成'
+                            }}</span>
                         </div>
                         <div style="font-size: 12px;color: grey">
                           <span style="margin-right: 10px">任务开始时间: {{ formatDate(item.startTime) }}</span>
@@ -245,7 +257,8 @@ const getAIResponse = (input) => {
           <div v-for="(message, index) in messages" :key="index" :class="message.sender" v-html="message.text">
           </div>
           <div>
-            <input v-model="newMessage" @keyup.enter="sendMessage" placeholder="这里输入你想问的问题叭" />
+            <input class="modern-input" v-model="newMessage" @keyup.enter="sendMessage"
+                   placeholder="这里输入你想问的问题叭"/>
           </div>
         </div>
       </div>
@@ -259,7 +272,29 @@ const getAIResponse = (input) => {
   background-image: linear-gradient(to right, #d4eaf7, #b6ccd8);
   border-radius: 20px;
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  transition: .3s;
+
+  &:hover {
+    cursor: pointer;
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+  }
 }
+.warn-info-card {
+  height: calc((100% - 20px) / 2);
+  background-image: linear-gradient(to right, #ffbbbb99, #f7cac9);
+  border-radius: 20px;margin-top: 20px;
+  transition: .3s;
+
+  &:hover {
+    cursor: pointer;
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+  }
+}
+
+
+
 .title {
   font-weight: bold;
   font-size: 30px;
@@ -289,13 +324,22 @@ const getAIResponse = (input) => {
   border-radius: 4px;
   overflow: hidden;
 }
+
 .overview-client-card {
-  border-radius: 5px;
-  background-color: #e3e8ea;
+  border-radius: 10px;
+  background-color: rgba(241, 229, 177, 0.71);
   padding: 10px;
   display: flex;
   align-items: center;
   margin: 10px;
+  transition: .3s;
+
+  &:hover {
+    cursor: pointer;
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+  }
+
 }
 
 .warn-card {
@@ -307,7 +351,7 @@ const getAIResponse = (input) => {
 
 .user {
   text-align: right;
-  background-color: #dbdbdb;
+  background-image: linear-gradient(to right, #dddddd, #f1eedb);
   margin: 10px;
   padding: 10px;
   border-radius: 10px;
@@ -315,7 +359,7 @@ const getAIResponse = (input) => {
 
 .ai {
   text-align: left;
-  background-color: #c3dbe6;
+  background-image: linear-gradient(to right, #d4eaf7, #b6ccd8);
   margin: 10px;
   padding: 10px;
   border-radius: 10px;
@@ -325,5 +369,20 @@ input {
   width: 100%;
   padding: 10px;
   margin-top: 10px;
+}
+
+.modern-input {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 25px;
+  background-color: #f2f2f2;
+  color: #333;
+  font-size: 16px;
+  margin-top: 20px;
+}
+
+.modern-input::placeholder {
+  color: #999;
 }
 </style>
