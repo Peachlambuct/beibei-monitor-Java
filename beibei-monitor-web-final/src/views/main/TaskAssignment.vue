@@ -1,6 +1,7 @@
 <script setup>
 
 import {Plus} from "@element-plus/icons-vue";
+import moment from 'moment';
 import TaskCard from "@/component/TaskCard.vue";
 import {reactive, ref, watch} from "vue";
 import {get, post} from "@/net";
@@ -44,6 +45,14 @@ if(store.isAdmin) {
 }
 function getTaskList() {
   get("/api/task/list", (res) => {
+    res.forEach(item => {
+      item.startTime = moment(item.startTime).format('YYYY-MM-DD HH:mm:ss')
+      item.endTime = moment(item.endTime).format('YYYY-MM-DD HH:mm:ss')
+      item.subtasks.forEach(subTask => {
+        subTask.startTime = moment(subTask.startTime).format('YYYY-MM-DD HH:mm:ss')
+        subTask.endTime = moment(subTask.endTime).format('YYYY-MM-DD HH:mm:ss')
+      })
+    })
     taskList.value = res
     console.info("服务器获取" + res)
   })
@@ -121,12 +130,14 @@ function updateTask(data) {
               v-model="mainTask.startTime"
               type="date"
               placeholder="任务开始日期"
+              value-format="YYYY-MM-DD HH:mm:ss"
               style="margin-bottom: 10px"
           ></el-date-picker>
           <el-date-picker
               v-model="mainTask.endTime"
               type="date"
               placeholder="任务结束日期"
+              value-format="YYYY-MM-DD HH:mm:ss"
               style="margin-bottom: 10px;margin-left: 10px"
           ></el-date-picker>
           <div style="font-weight: bold">项目小组成员</div>
@@ -174,12 +185,14 @@ function updateTask(data) {
                 v-model="subTask.startTime"
                 type="date"
                 placeholder="选择日期"
+                value-format="YYYY-MM-DD HH:mm:ss"
                 style="margin-bottom: 10px"
             ></el-date-picker>
             <el-date-picker
                 v-model="subTask.endTime"
                 type="date"
                 placeholder="选择日期"
+                value-format="YYYY-MM-DD HH:mm:ss"
                 style="margin-bottom: 10px;margin-left: 10px"
             ></el-date-picker>
             <el-button style="float: right" type="primary" @click="removeSubTask(index)">删除</el-button>
