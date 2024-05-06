@@ -112,7 +112,7 @@ function formatDateTo(date) {
                 <li>项目名称：{{ item.name }}</li>
                 <li>项目描述：{{ item.description }}</li>
                 <li>项目开始时间：{{ formatDate(item.startTime) }}</li>
-                <li>项目结束时间：{{ formatDate(item.startTime) }}</li>
+                <li>项目结束时间：{{ formatDate(item.endTime) }}</li>
                 <li>项目当前状态：
                   <el-tag :type="item.status === 0 ? 'warning':'success'">{{ item.status === 0 ? '未完成' : '已完成' }}
                   </el-tag>

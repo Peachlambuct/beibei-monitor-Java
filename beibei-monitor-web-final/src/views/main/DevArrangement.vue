@@ -1,6 +1,7 @@
 <script setup>
 import {ref, watch} from "vue";
 import {get} from "@/net";
+import moment from "moment/moment";
 
 const taskList = ref([])
 const show = ref(false)
@@ -11,10 +12,14 @@ let taskTypes = []
 function getPage() {
   get('/api/task/getAllSubtask', data => {
     taskList.value = data.map(task => {
-      const date = new Date(task.startTime);
-      task.startTime = date.toLocaleDateString('en-CA');
-      task.endTime = date.toLocaleDateString('en-CA');
-      task.updateTime = date.toLocaleDateString('en-CA');
+      task.startTime = moment(task.startTime).format('YYYY-MM-DD')
+      task.endTime = moment(task.endTime).format('YYYY-MM-DD')
+      if (task.updateTime){
+        task.updateTime = moment(task.updateTime).format('YYYY-MM-DD')
+      }else {
+        task.updateTime = '无'
+      }
+
       return task;
     });
     taskList.value.sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
