@@ -51,7 +51,11 @@ onUnmounted(() => {
 
 const newMessage = ref('');
 const messages = ref([]);
-
+messages.value.push({
+  id: 0,
+  text: '你好，我是您的AI助手，有什么问题可以问我哦~',
+  sender: 'ai'
+});
 
 let currentAIResponse = ref(null);
 
@@ -171,11 +175,13 @@ const getAIResponse = (input) => {
         </div>
       </div>
       <div
-          style="flex: 8;background-image: linear-gradient(to right, #e0ffcc, #e7e8c4);margin-left: 20px;border-radius: 10px;box-shadow: inset 0 0 3px #b9b8b8;">
+          style="flex: 8;background-image: url('img_2.png');background-position: center; background-size: cover;margin-left: 20px;border-radius: 10px;box-shadow: inset 0 0 3px #b9b8b8;">
         <div v-if="store.isAdmin">
-          <span style="font-weight: bold;font-size: 30px;margin: 5px 10px">在线服务器列表</span>
+          <span style="font-weight: bold;font-size: 30px;margin: 5px 10px;color: #d6d6d6">在线服务器列表</span>
           <span
-              style="font-weight: bold;font-size: 27px;margin: 0 10px">{{ onlineCount }} / {{ simpleList.length }}</span>
+              style="font-weight: bold;font-size: 27px;margin: 0 10px;color: #d6d6d6">{{ onlineCount }} / {{
+              simpleList.length
+            }}</span>
           <div style="flex-wrap: wrap;gap: 10px">
             <div style="margin: 0 10px">
               <el-scrollbar max-height="350px">
@@ -191,13 +197,13 @@ const getAIResponse = (input) => {
                               :type="item.online ? 'success': 'warning'">{{ item.online ? '在线' : '离线' }}</el-tag>
                         </span>
                       </div>
-                      <div style="font-size: 12px;color: grey">
+                      <div style="font-size: 12px;color: #505050">
                         操作系统:
                         <i :style="{color: osNameToIcon(item.osName).color}"
                            :class="`fa-brands ${osNameToIcon(item.osName).icon}`"></i>
                         {{ `${item.osName} ${item.osVersion}` }}
                       </div>
-                      <div style="font-size: 12px;color: grey">
+                      <div style="font-size: 12px;color: #505050">
                         <span style="margin-right: 10px">公网IP: {{ item.ip }}</span>
                       </div>
                     </div>
@@ -257,8 +263,8 @@ const getAIResponse = (input) => {
           <div v-for="(message, index) in messages" :key="index" :class="message.sender" v-html="message.text">
           </div>
           <div>
-            <input class="modern-input" v-model="newMessage" @keyup.enter="sendMessage"
-                   placeholder="这里输入你想问的问题叭"/>
+            <q-input rounded standout="bg-blue-2 text-black" v-model="newMessage" @keyup.enter="sendMessage"
+                     label="这里输入你的问题..."/>
           </div>
         </div>
       </div>
@@ -280,10 +286,12 @@ const getAIResponse = (input) => {
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
   }
 }
+
 .warn-info-card {
   height: calc((100% - 20px) / 2);
-  background-image: linear-gradient(to right, #ffbbbb99, #f7cac9);
-  border-radius: 20px;margin-top: 20px;
+  background-image: linear-gradient(to right, #ffbbbb, #f3c2c1);
+  border-radius: 20px;
+  margin-top: 20px;
   transition: .3s;
 
   &:hover {
@@ -292,7 +300,6 @@ const getAIResponse = (input) => {
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
   }
 }
-
 
 
 .title {
@@ -327,7 +334,7 @@ const getAIResponse = (input) => {
 
 .overview-client-card {
   border-radius: 10px;
-  background-color: rgba(241, 229, 177, 0.71);
+  background-color: rgba(223, 222, 222, 0.71);
   padding: 10px;
   display: flex;
   align-items: center;

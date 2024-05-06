@@ -6,7 +6,7 @@
   <div style="width: 100vw;height: 100vh;overflow: hidden;display: flex;">
     <div style="flex: 1">
       <el-image style="width: 100%;height: 100%" fit="cover"
-                src="icon/image/Welcome.png"/>
+                src="welcome.png"/>
     </div>
     <div class="welcome-title">
       <div style="font-size: 30px;font-weight: bold">欢迎来到巡游云梧服务器监控管理系统</div>

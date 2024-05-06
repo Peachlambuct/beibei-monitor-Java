@@ -63,7 +63,6 @@ function deleteSSH(id) {
 .card {
   background-image: linear-gradient(to right, rgba(212, 234, 247, 0.6), #d6d6d6);
   height: 120px;
-  width: 45%;
   border-radius: 10px;
   margin: 20px;
   display: flex;

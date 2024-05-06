@@ -17,7 +17,7 @@ const store = useStore()
 
 <template>
   <el-container class="back_ground">
-    <el-header style="background-color: #dbeacd;width: 100%" height="40px">
+    <el-header style="background-color: #cacaca;width: 100%" height="40px">
     </el-header>
     <el-container class="center">
       <el-aside width="230">
@@ -204,12 +204,12 @@ const store = useStore()
 }
 
 .el-menu-item.is-active {
-  background-color: #f6e9b599;
+  background-color: #d4e3f7;
   border-radius: 15px;
 }
 
 .el-menu-item.is-active .menu-icon {
-  background-color: #f6e9b599;
+  background-color: #d4e3f7;
   height: 35px;
   width: 35px;
   border-radius: 10px

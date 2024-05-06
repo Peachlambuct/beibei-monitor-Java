@@ -86,7 +86,7 @@ setInterval(() => {
 }, 10000)
 
 const now = computed(() => details.runtime.list[details.runtime.list.length - 1])
-const task = ref()
+const task = ref([])
 const init = id => {
   if(id !== -1) {
     details.base = {}
@@ -263,23 +263,25 @@ watch(() => props.id, init, { immediate: true })
           </div>
         </div>
 
-        <div class="title" style="margin-top: 20px">
-          <i class="fa-solid fa-gauge-high"></i>
-          项目信息
-        </div>
-        <el-divider style="margin: 10px 0"/>
-        <div>
-          <el-scrollbar max-height="200">
-            <div v-for="item in task">
-              <div class="task-card">
-                <div style="font-size: 20px;font-weight: bold">{{item.name}}</div>
-                <div>
-                  <span style="color: gray">开发进度：</span>
-                  <span>{{item.status === 0 ? '开发中': '已完成'}}</span>
+        <div v-if="task.length">
+          <div class="title" style="margin-top: 20px">
+            <i class="fa-solid fa-gauge-high"></i>
+            项目信息
+          </div>
+          <el-divider style="margin: 10px 0"/>
+          <div>
+            <el-scrollbar max-height="200">
+              <div v-for="item in task">
+                <div class="task-card">
+                  <div style="font-size: 20px;font-weight: bold">{{item.name}}</div>
+                  <div>
+                    <span style="color: gray">开发进度：</span>
+                    <span>{{item.status === 0 ? '开发中': '已完成'}}</span>
+                  </div>
                 </div>
               </div>
-            </div>
-          </el-scrollbar>
+            </el-scrollbar>
+          </div>
         </div>
       </div>
     </div>
@@ -329,14 +331,14 @@ watch(() => props.id, init, { immediate: true })
 }
 .ssh-card {
   background-image: linear-gradient(to right, rgba(212, 234, 247, 0.6), #d6d6d6);
-  height: 70px;
+  height: 100px;
   width: 80%;
   border-radius: 10px;
   margin: 20px;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 20px;
+  padding: 20px 20px;
   font-size: 16px;
   font-weight: bold;
   color: #606060;
@@ -351,7 +353,7 @@ watch(() => props.id, init, { immediate: true })
 
 .task-card {
   background-image: linear-gradient(to right, #f3f3f3, #f8f8f8);
-  height: 50px;
+  height: 100px;
   width: 80%;
   border-radius: 10px;
   margin: 20px;
