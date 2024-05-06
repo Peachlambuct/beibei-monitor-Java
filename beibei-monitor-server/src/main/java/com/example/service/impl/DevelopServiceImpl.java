@@ -25,9 +25,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class DevelopServiceImpl extends ServiceImpl<DevelopTaskMapper, DevelopTask> implements DevelopService {
@@ -122,11 +120,20 @@ public class DevelopServiceImpl extends ServiceImpl<DevelopTaskMapper, DevelopTa
         if (task.getStartTime().after(task.getEndTime())){
             return "开始时间不能小于当前时间";
         }
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+        calendar.setTime(task.getStartTime());
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
+        Date adjustedStartTime = calendar.getTime();
+
+        calendar.setTime(task.getEndTime());
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
+        Date adjustedEndTime = calendar.getTime();
+
         DevelopTask developTask = new DevelopTask(null, task.getName(),
                 JSONArray.copyOf(task.getPrincipalIds()).toJSONString(),
                 task.getType(), task.getDescription(),
-                JSONArray.copyOf(task.getAboutClientId()).toJSONString(), task.getStartTime(),
-                task.getEndTime(), null);
+                JSONArray.copyOf(task.getAboutClientId()).toJSONString(), adjustedStartTime,
+                adjustedEndTime, null);
         List<SubtaskSaveVO> subtasks = task.getSubtasks();
         for (SubtaskSaveVO subtask : subtasks) {
             if (subtask.getStartTime().after(subtask.getEndTime())){

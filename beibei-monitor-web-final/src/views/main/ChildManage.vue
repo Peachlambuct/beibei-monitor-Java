@@ -40,35 +40,46 @@ const initSubAccounts = () =>
 
     <el-divider style="margin: 10px 0"/>
 
-    <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%;">
-      <div class="info-card" style="flex: 60%;">
+    <div style="flex: 50%;justify-content: center;align-items: center;display: flex;height: 100%;flex-direction: column;">
+      <div class="info-card">
         <div class="title"><i class="fa-solid fa-users"></i> 子用户管理</div>
         <el-divider style="margin: 10px 0"/>
-        <div v-if="accounts.length" style="text-align: center">
-          <div v-for="item in accounts" class="account-card">
-            <el-avatar class="avatar" :size="30"
-                       src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"/>
-            <div style="margin-left: 15px;line-height: 18px;flex: 1">
+        <div v-if="accounts.length">
+          <div v-for="item in accounts" :key="item.id" class="q-my-md row account-card">
+            <q-avatar src="https://cdn.quasar.dev/img/avatar.png" />
+            <div class="q-ml-md">
               <div>
-                <span>{{item.username}}</span>
-                <span style="font-size: 13px;color: grey;margin-left: 5px">
-                管理 {{item.clientList.length}} 个服务器
-              </span>
+                <span style="font-weight: bold">{{item.username}}</span>
+                <span class="text-caption q-ml-xs">管理 {{item.clientList.length}} 个服务器</span>
               </div>
-              <div style="font-size: 13px;color: grey">{{item.email}}</div>
+              <div class="text-caption">{{item.email}}</div>
             </div>
-            <el-button type="danger" :icon="Delete"
-                       @click="deleteAccount(item.id)" text>删除子账户</el-button>
+            <div class="row justify-end">
+              <q-btn class="q-ml-md" color="negative" @click="deleteAccount(item.id)" icon="delete" label="删除子账户" />
+            </div>
           </div>
-          <el-button :icon="Plus" type="primary"
-                     @click="createAccount = true" plain>添加更多子用户</el-button>
+          <q-btn color="primary" @click="createAccount = true" icon="add" label="添加更多子用户" />
         </div>
+
         <div v-else>
-          <el-empty :image-size="100" description="还没有任何子用户哦" v-if="store.isAdmin">
-            <el-button :icon="Plus" type="primary" plain
-                       @click="createAccount = true">添加子用户</el-button>
-          </el-empty>
-          <el-empty :image-size="100" description="子账户只能由管理员账号进行操作" v-else/>
+          <q-card v-if="store.isAdmin" class="q-my-md">
+            <q-card-section class="row items-center q-gutter-sm">
+              <q-icon name="sentiment_dissatisfied" size="lg" />
+              <div>
+                <div class="text-h6">还没有任何子用户哦</div>
+                <div>点击下方按钮添加子用户</div>
+              </div>
+            </q-card-section>
+            <q-card-section>
+              <q-btn color="primary" @click="createAccount = true" icon="add" label="添加子用户" />
+            </q-card-section>
+          </q-card>
+          <q-card v-else class="q-my-md">
+            <q-card-section class="row items-center q-gutter-sm">
+              <q-icon name="sentiment_dissatisfied" size="lg" />
+              <div class="text-h6">子账户只能由管理员账号进行操作</div>
+            </q-card-section>
+          </q-card>
         </div>
       </div>
     </div>
@@ -86,8 +97,10 @@ const initSubAccounts = () =>
 .info-card {
   border-radius: 7px;
   padding: 15px 20px;
-  background-color: rgba(230, 230, 230, 0.53);
+  background-color: rgba(239, 239, 239, 0.93);
   height: fit-content;
+  width: 60%;
+  margin: 20px 0;
 
   .title {
     font-size: 18px;
@@ -97,12 +110,13 @@ const initSubAccounts = () =>
 
 .account-card {
   border-radius: 5px;
-  background-color: #e7f0f1;
+  background-color: #e1e1e1;
   padding: 10px;
   display: flex;
   align-items: center;
   text-align: left;
   margin: 10px 0;
+  width: 100%;
 }
 
 </style>

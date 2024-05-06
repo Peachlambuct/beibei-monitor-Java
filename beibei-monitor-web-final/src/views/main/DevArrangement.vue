@@ -76,9 +76,9 @@ function initItem(data) {
       <el-timeline style="max-width: 100%">
         <el-timeline-item style="width: 70%" v-for="item in selectedTasks" :key="item" :timestamp="item.startTime"
                           placement="top">
-          <el-card class="taskCard" @click="initItem(item)">
-          <span style="display: flex; align-items: center;">
-            <h2>{{ item.name }}</h2>
+          <el-card class="taskCard" @click="initItem(item)" style="border-radius: 20px">
+          <span style="display: flex; align-items: center;margin: 20px 0">
+            <span style="font-weight: bold;font-size: 25px">{{ item.name }}</span>
             <el-tag style="margin-left: 40px">{{ item.taskType }}</el-tag>
           </span>
             <p>任务描述：{{ item.description }}</p>

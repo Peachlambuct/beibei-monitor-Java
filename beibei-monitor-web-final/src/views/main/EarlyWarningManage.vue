@@ -120,9 +120,22 @@ onMounted(() => {
       </div>
     </el-dialog>
 
-    <div style="display: flex; flex-direction: row; flex-wrap: wrap;" v-if="warnList.length">
-      <WarnCard v-for="item in warnList" :warn-rule="item" @update-warn-rule="getWarnList"/>
+    <div style="display: flex; flex-wrap: wrap;" v-if="warnList.length">
+      <q-intersection
+          v-for="item in warnList"
+          transition="scale"
+          class="example-item"
+          style="width: 50%;"
+          v-if="warnList.length"
+      >
+        <WarnCard :warn-rule="item" @update-warn-rule="getWarnList"/>
+      </q-intersection>
     </div>
+
+
+<!--    <div style="display: flex; flex-direction: row; flex-wrap: wrap;" v-if="warnList.length">-->
+<!--      -->
+<!--    </div>-->
     <el-empty description="还没有任何预警规则哦，点击右上角添加一个吧" v-else/>
   </div>
 </template>

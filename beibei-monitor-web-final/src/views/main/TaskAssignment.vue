@@ -90,6 +90,20 @@ function updateTask(data) {
   show.value = true
 }
 
+function initTable() {
+  show.value = true
+  mainTask.value = {
+    name: '',
+    type: '',
+    description: '',
+    principalIds: [],
+    startTime: '',
+    endTime: '',
+    aboutClientId: [],
+    subtasks: []
+  }
+}
+
 </script>
 
 <template>
@@ -105,7 +119,7 @@ function updateTask(data) {
       </div>
       <div>
         <el-button color="#b6ccd8" :icon="Plus" type="primary"
-                   @click="show = true">添加新的任务</el-button>
+                   @click="initTable">添加新的任务</el-button>
       </div>
     </div>
     <el-divider style="margin: 10px 0"/>
@@ -193,8 +207,16 @@ function updateTask(data) {
       </div>
     </el-dialog>
 
-    <div style="display: flex; flex-direction: row; flex-wrap: wrap;" v-if="taskList.length">
-      <TaskCard @update-task="updateTask" @delete-task="getTaskList" v-for="item in taskList" :data="item"/>
+    <div style="display: flex; flex-wrap: wrap;" v-if="taskList.length">
+      <q-intersection
+          v-for="item in taskList"
+          transition="scale"
+          class="example-item"
+          v-if="taskList.length"
+          style="width: 50%"
+      >
+        <TaskCard @update-task="updateTask" @delete-task="getTaskList" :data="item"/>
+      </q-intersection>
     </div>
     <el-empty description="还没有任何任务哦" v-else/>
   </div>
