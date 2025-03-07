@@ -3,7 +3,7 @@
 import {Plus} from "@element-plus/icons-vue";
 import moment from 'moment';
 import TaskCard from "@/component/TaskCard.vue";
-import {reactive, ref, watch} from "vue";
+import {ref, watch} from "vue";
 import {get, post} from "@/net";
 import {ElMessage} from "element-plus";
 import {osNameToIcon} from "@/tools";

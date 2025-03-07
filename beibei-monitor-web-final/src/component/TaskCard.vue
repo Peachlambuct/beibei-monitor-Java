@@ -11,11 +11,12 @@ const show = ref(false);
 const info = defineProps({
   data: Object
 })
+
 const projectDate = reactive({
   'from': formatDateTo(info.data.startTime),
   'to': formatDateTo(info.data.endTime)
 })
-console.info(projectDate)
+
 
 function deleteTask(id) {
   get(`/api/task/deleteTask?taskId=${id}`, () => {
