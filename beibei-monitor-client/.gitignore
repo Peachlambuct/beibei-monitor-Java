@@ -1,0 +1,6 @@
+/target
+/log
+/config
+.vscode
+Cargo.lock
+.idea
