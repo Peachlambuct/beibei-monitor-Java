@@ -9,9 +9,9 @@ spring:
     user: beibei
     password: Aa123456
   mail:
-    host: smtp.163.com
-    username: 17784774733@163.com
-    password: CXFLNTXKRTWXQNRP
+    host: XXXXXXXXXXX
+    username: XXXXXXXXXXXXX
+    password: XXXXXXXXXXXXXXX
   rabbitmq:
     addresses: 192.168.41.200:5672
     username: admin
